@@ -21,6 +21,11 @@ const alchemyApiKey: string | undefined = process.env.ALCHEMY_API_KEY;
 if (!alchemyApiKey) {
   throw new Error("Please set your ALCHEMY_API_KEY in a .env file");
 }
+const alchemyMainnetApiKey: string | undefined = process.env.ALCHEMY_MAINNET_API_KEY;
+if (!alchemyMainnetApiKey) {
+  throw new Error("Please set your ALCHEMY_MAINNET_API_KEY in a .env file");
+}
+
 let privateKey: string = "";
 const privateKeyRaw: string | undefined = process.env.PRIVATE_KEY;
 if (!privateKeyRaw) {
@@ -43,6 +48,9 @@ function getChainConfig(chain: keyof typeof chainIds): NetworkUserConfig {
     case "goerli":
       jsonRpcUrl = "https://eth-goerli.g.alchemy.com/v2/" + alchemyApiKey;
       break;
+      case "mainnet":
+        jsonRpcUrl = "https://eth-mainnet.g.alchemy.com/v2/" + alchemyMainnetApiKey;
+        break;
     default:
       jsonRpcUrl = "https://" + chain + ".g.alchemy.com/v2/" + alchemyApiKey;
   }
@@ -63,7 +71,8 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
-      goerli:process.env.ETHERSCAN_API_KEY || ""
+      goerli:process.env.ETHERSCAN_API_KEY || "",
+      mainnet:process.env.ETHERSCAN_API_KEY || ""
     },
   },
   gasReporter: {
