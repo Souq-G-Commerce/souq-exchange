@@ -24,7 +24,7 @@ You can join the [Discord](https://discord.gg/clubsouq) channel if you have any 
 
 You can find all the technical documentation for the souq project in the following link
 
-- [Technical Documentation](https://app.gitbook.com/o/r95xvjR5BlDqvzSJO8Ca/home)
+- [Technical Documentation](https://docs.souq.finance/)
 
 ## Getting Started
 
