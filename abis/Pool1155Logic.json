@@ -1,0 +1,513 @@
+[
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "v",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "f",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "AddedSubPool",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256[]",
+				"name": "subPoolIds",
+				"type": "uint256[]"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "newStatus",
+				"type": "bool"
+			}
+		],
+		"name": "ChangedSubpoolStatus",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "LPAdress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "poolAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address[]",
+				"name": "tokens",
+				"type": "address[]"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "symbol",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint8",
+				"name": "decimals",
+				"type": "uint8"
+			}
+		],
+		"name": "LPTokenDeployed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "moverId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "movedId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "MovedReserve",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "startId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "endId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newSubPoolId",
+				"type": "uint256"
+			}
+		],
+		"name": "MovedShares",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newSubPoolId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256[]",
+				"name": "ids",
+				"type": "uint256[]"
+			}
+		],
+		"name": "MovedSharesList",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "token",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "receiver",
+				"type": "address"
+			}
+		],
+		"name": "Rescued",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256[]",
+				"name": "poolIds",
+				"type": "uint256[]"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256[]",
+				"name": "vArray",
+				"type": "uint256[]"
+			}
+		],
+		"name": "UpdatedV",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "feeType",
+				"type": "string"
+			}
+		],
+		"name": "WithdrawnFees",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "yieldGeneratorAddress",
+				"type": "address"
+			}
+		],
+		"name": "YieldDeposited",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "yieldGeneratorAddress",
+				"type": "address"
+			}
+		],
+		"name": "YieldWithdrawn",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "totalFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "swapFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royalties",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolFee",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct DataTypes.FeeReturn",
+				"name": "x",
+				"type": "tuple"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "totalFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "swapFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royalties",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolFee",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct DataTypes.FeeReturn",
+				"name": "y",
+				"type": "tuple"
+			}
+		],
+		"name": "addFees",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "totalFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "swapFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royalties",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolFee",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct DataTypes.FeeReturn",
+				"name": "z",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "totalFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "swapFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royalties",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolFee",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct DataTypes.FeeReturn",
+				"name": "fee",
+				"type": "tuple"
+			},
+			{
+				"internalType": "uint256",
+				"name": "num",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "den",
+				"type": "uint256"
+			}
+		],
+		"name": "multiplyFees",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "totalFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "swapFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royalties",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolFee",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct DataTypes.FeeReturn",
+				"name": "feeReturn",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "pure",
+		"type": "function"
+	}
+]

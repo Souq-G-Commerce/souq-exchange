@@ -1,0 +1,975 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "registry",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "previousAdmin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "newAdmin",
+				"type": "address"
+			}
+		],
+		"name": "AdminChanged",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "_beacon",
+				"type": "address"
+			}
+		],
+		"name": "BeaconDeployed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "beacon",
+				"type": "address"
+			}
+		],
+		"name": "BeaconUpgraded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "newStatus",
+				"type": "bool"
+			}
+		],
+		"name": "DeploymentByPoolAdminOnlySet",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "lpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minLpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolSellRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBuyRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minProtocolRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxProtocolRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxRoyaltiesFee",
+						"type": "uint256"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.FactoryFeeConfig",
+				"name": "feeConfig",
+				"type": "tuple"
+			}
+		],
+		"name": "FeeConfigSet",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint8",
+				"name": "version",
+				"type": "uint8"
+			}
+		],
+		"name": "Initialized",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "stable",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address[]",
+				"name": "tokens",
+				"type": "address[]"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "proxy",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "symbol",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "poolTvlLimit",
+				"type": "uint256"
+			}
+		],
+		"name": "PoolDeployed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "admin",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "newImplementation",
+				"type": "address"
+			}
+		],
+		"name": "PoolsUpgraded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "implementation",
+				"type": "address"
+			}
+		],
+		"name": "Upgraded",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "addressesRegistry",
+		"outputs": [
+			{
+				"internalType": "contract IAddressesRegistry",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "bool",
+						"name": "useAccessToken",
+						"type": "bool"
+					},
+					{
+						"internalType": "address",
+						"name": "accessToken",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "poolLPToken",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "stable",
+						"type": "address"
+					},
+					{
+						"internalType": "address[]",
+						"name": "tokens",
+						"type": "address[]"
+					},
+					{
+						"internalType": "address",
+						"name": "stableYieldAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "coefficientA",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "coefficientB",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "coefficientC",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "lpBuyFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "lpSellFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "royaltiesBuyFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "royaltiesSellFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "protocolBuyRatio",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "protocolSellRatio",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "royaltiesBalance",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "protocolBalance",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "royaltiesAddress",
+								"type": "address"
+							},
+							{
+								"internalType": "address",
+								"name": "protocolFeeAddress",
+								"type": "address"
+							}
+						],
+						"internalType": "struct DataTypes.PoolFee",
+						"name": "fee",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "poolTvlLimit",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "cooldown",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxDepositPercentage",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxWithdrawPercentage",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "minFeeMultiplier",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxFeeMultiplier",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint8",
+								"name": "addLiqMode",
+								"type": "uint8"
+							},
+							{
+								"internalType": "uint8",
+								"name": "removeLiqMode",
+								"type": "uint8"
+							},
+							{
+								"internalType": "bool",
+								"name": "onlyAdminProvisioning",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct DataTypes.LiquidityLimit",
+						"name": "liquidityLimit",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "minimumF",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint16",
+								"name": "maxBulkStepSize",
+								"type": "uint16"
+							},
+							{
+								"internalType": "uint16",
+								"name": "iterations",
+								"type": "uint16"
+							}
+						],
+						"internalType": "struct DataTypes.IterativeLimit",
+						"name": "iterativeLimit",
+						"type": "tuple"
+					}
+				],
+				"internalType": "struct DataTypes.PoolData",
+				"name": "poolData",
+				"type": "tuple"
+			},
+			{
+				"internalType": "string",
+				"name": "symbol",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			}
+		],
+		"name": "deployPool",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "feeConfig",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "lpBuyFee",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "lpSellFee",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "minLpFee",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "maxLpBuyFee",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "maxLpSellFee",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "protocolSellRatio",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "protocolBuyRatio",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "minProtocolRatio",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "maxProtocolRatio",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "royaltiesBuyFee",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "royaltiesSellFee",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "maxRoyaltiesFee",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getBeaconAddress",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getFeeConfig",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "lpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minLpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolSellRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBuyRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minProtocolRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxProtocolRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxRoyaltiesFee",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct DataTypes.FactoryFeeConfig",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getPool",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getPoolsCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getPoolsVersion",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getVersion",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_poolLogic",
+				"type": "address"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "lpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minLpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolSellRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBuyRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minProtocolRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxProtocolRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxRoyaltiesFee",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct DataTypes.FactoryFeeConfig",
+				"name": "_feeConfig",
+				"type": "tuple"
+			}
+		],
+		"name": "initialize",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "onlyPoolAdminDeployments",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "pools",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "poolsVersion",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "proxiableUUID",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bool",
+				"name": "status",
+				"type": "bool"
+			}
+		],
+		"name": "setDeploymentByPoolAdminOnly",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "lpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minLpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolSellRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBuyRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minProtocolRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxProtocolRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxRoyaltiesFee",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct DataTypes.FactoryFeeConfig",
+				"name": "newConfig",
+				"type": "tuple"
+			}
+		],
+		"name": "setFeeConfig",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newLogic",
+				"type": "address"
+			}
+		],
+		"name": "upgradePools",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newImplementation",
+				"type": "address"
+			}
+		],
+		"name": "upgradeTo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newImplementation",
+				"type": "address"
+			},
+			{
+				"internalType": "bytes",
+				"name": "data",
+				"type": "bytes"
+			}
+		],
+		"name": "upgradeToAndCall",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "version",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]

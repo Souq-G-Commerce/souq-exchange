@@ -1,0 +1,696 @@
+[
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "lpAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "counter",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "total",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "tokenId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct DataTypes.AMMShare1155[]",
+						"name": "shares",
+						"type": "tuple[]"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "PV",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "swapPV",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "value",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "F",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "totalFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "swapFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "lpFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "royalties",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "protocolFee",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct DataTypes.FeeReturn",
+								"name": "fees",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct DataTypes.SharesCalculationReturn",
+						"name": "sharesCal",
+						"type": "tuple"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.SubPoolGroup[]",
+				"name": "subPoolGroups",
+				"type": "tuple[]"
+			}
+		],
+		"name": "AddedLiqShares",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "stableIn",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "lpAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			}
+		],
+		"name": "AddedLiqStable",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "subPoolId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "stableIn",
+				"type": "uint256"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256[]",
+						"name": "amounts",
+						"type": "uint256[]"
+					},
+					{
+						"internalType": "uint256[]",
+						"name": "tokenIds",
+						"type": "uint256[]"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.Shares1155Params",
+				"name": "params",
+				"type": "tuple"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "totalShares",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "F",
+				"type": "uint256"
+			}
+		],
+		"name": "DepositInitiated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "lpAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "queued",
+				"type": "bool"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "counter",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "total",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "tokenId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct DataTypes.AMMShare1155[]",
+						"name": "shares",
+						"type": "tuple[]"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "PV",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "swapPV",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "value",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "F",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "totalFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "swapFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "lpFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "royalties",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "protocolFee",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct DataTypes.FeeReturn",
+								"name": "fees",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct DataTypes.SharesCalculationReturn",
+						"name": "sharesCal",
+						"type": "tuple"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.SubPoolGroup[]",
+				"name": "subPoolGroups",
+				"type": "tuple[]"
+			}
+		],
+		"name": "RemovedLiqShares",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "stableOut",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "lpAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "queued",
+				"type": "bool"
+			}
+		],
+		"name": "RemovedLiqStable",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "stableOut",
+				"type": "uint256"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "totalFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "swapFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royalties",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolFee",
+						"type": "uint256"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.FeeReturn",
+				"name": "fees",
+				"type": "tuple"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "counter",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "total",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "tokenId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct DataTypes.AMMShare1155[]",
+						"name": "shares",
+						"type": "tuple[]"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "PV",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "swapPV",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "value",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "F",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "totalFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "swapFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "lpFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "royalties",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "protocolFee",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct DataTypes.FeeReturn",
+								"name": "fees",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct DataTypes.SharesCalculationReturn",
+						"name": "sharesCal",
+						"type": "tuple"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.SubPoolGroup[]",
+				"name": "subPoolGroups",
+				"type": "tuple[]"
+			}
+		],
+		"name": "SwappedShares",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "stableIn",
+				"type": "uint256"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "totalFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "swapFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royalties",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolFee",
+						"type": "uint256"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.FeeReturn",
+				"name": "fees",
+				"type": "tuple"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "counter",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "total",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "tokenId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct DataTypes.AMMShare1155[]",
+						"name": "shares",
+						"type": "tuple[]"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "PV",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "swapPV",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "value",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "F",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "totalFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "swapFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "lpFee",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "royalties",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "protocolFee",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct DataTypes.FeeReturn",
+								"name": "fees",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct DataTypes.SharesCalculationReturn",
+						"name": "sharesCal",
+						"type": "tuple"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.SubPoolGroup[]",
+				"name": "subPoolGroups",
+				"type": "tuple[]"
+			}
+		],
+		"name": "SwappedStable",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "transactionsCount",
+				"type": "uint256"
+			}
+		],
+		"name": "WithdrawalsProcessed",
+		"type": "event"
+	}
+]

@@ -1,0 +1,910 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_registry",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "lpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBuyRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolSellRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBalance",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBalance",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "royaltiesAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "protocolFeeAddress",
+						"type": "address"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.PoolFee",
+				"name": "_newFee",
+				"type": "tuple"
+			}
+		],
+		"name": "FeeChanged",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "bool",
+						"name": "useAccessToken",
+						"type": "bool"
+					},
+					{
+						"internalType": "address",
+						"name": "accessToken",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "poolLPToken",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "stable",
+						"type": "address"
+					},
+					{
+						"internalType": "address[]",
+						"name": "tokens",
+						"type": "address[]"
+					},
+					{
+						"internalType": "address",
+						"name": "stableYieldAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "coefficientA",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "coefficientB",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "coefficientC",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "lpBuyFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "lpSellFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "royaltiesBuyFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "royaltiesSellFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "protocolBuyRatio",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "protocolSellRatio",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "royaltiesBalance",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "protocolBalance",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "royaltiesAddress",
+								"type": "address"
+							},
+							{
+								"internalType": "address",
+								"name": "protocolFeeAddress",
+								"type": "address"
+							}
+						],
+						"internalType": "struct DataTypes.PoolFee",
+						"name": "fee",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "poolTvlLimit",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "cooldown",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxDepositPercentage",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxWithdrawPercentage",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "minFeeMultiplier",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxFeeMultiplier",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint8",
+								"name": "addLiqMode",
+								"type": "uint8"
+							},
+							{
+								"internalType": "uint8",
+								"name": "removeLiqMode",
+								"type": "uint8"
+							},
+							{
+								"internalType": "bool",
+								"name": "onlyAdminProvisioning",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct DataTypes.LiquidityLimit",
+						"name": "liquidityLimit",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "minimumF",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint16",
+								"name": "maxBulkStepSize",
+								"type": "uint16"
+							},
+							{
+								"internalType": "uint16",
+								"name": "iterations",
+								"type": "uint16"
+							}
+						],
+						"internalType": "struct DataTypes.IterativeLimit",
+						"name": "iterativeLimit",
+						"type": "tuple"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.PoolData",
+				"name": "_data",
+				"type": "tuple"
+			}
+		],
+		"name": "PoolDataSet",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "minimumF",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint16",
+						"name": "maxBulkStepSize",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "iterations",
+						"type": "uint16"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.IterativeLimit",
+				"name": "_limits",
+				"type": "tuple"
+			}
+		],
+		"name": "PoolIterativeLimitsSet",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "poolTvlLimit",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "cooldown",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxDepositPercentage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxWithdrawPercentage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minFeeMultiplier",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxFeeMultiplier",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint8",
+						"name": "addLiqMode",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint8",
+						"name": "removeLiqMode",
+						"type": "uint8"
+					},
+					{
+						"internalType": "bool",
+						"name": "onlyAdminProvisioning",
+						"type": "bool"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct DataTypes.LiquidityLimit",
+				"name": "_limits",
+				"type": "tuple"
+			}
+		],
+		"name": "PoolLiquidityLimitsSet",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "addressesRegistry",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "poolData",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "useAccessToken",
+				"type": "bool"
+			},
+			{
+				"internalType": "address",
+				"name": "accessToken",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "poolLPToken",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "stable",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "stableYieldAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "coefficientA",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "coefficientB",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "coefficientC",
+				"type": "uint256"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "lpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBuyRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolSellRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBalance",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBalance",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "royaltiesAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "protocolFeeAddress",
+						"type": "address"
+					}
+				],
+				"internalType": "struct DataTypes.PoolFee",
+				"name": "fee",
+				"type": "tuple"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "poolTvlLimit",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "cooldown",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxDepositPercentage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxWithdrawPercentage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minFeeMultiplier",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxFeeMultiplier",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint8",
+						"name": "addLiqMode",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint8",
+						"name": "removeLiqMode",
+						"type": "uint8"
+					},
+					{
+						"internalType": "bool",
+						"name": "onlyAdminProvisioning",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct DataTypes.LiquidityLimit",
+				"name": "liquidityLimit",
+				"type": "tuple"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "minimumF",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint16",
+						"name": "maxBulkStepSize",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "iterations",
+						"type": "uint16"
+					}
+				],
+				"internalType": "struct DataTypes.IterativeLimit",
+				"name": "iterativeLimit",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "lpBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lpSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBuyFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesSellFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBuyRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolSellRatio",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "royaltiesBalance",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "protocolBalance",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "royaltiesAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "protocolFeeAddress",
+						"type": "address"
+					}
+				],
+				"internalType": "struct DataTypes.PoolFee",
+				"name": "newFee",
+				"type": "tuple"
+			}
+		],
+		"name": "setFee",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "bool",
+						"name": "useAccessToken",
+						"type": "bool"
+					},
+					{
+						"internalType": "address",
+						"name": "accessToken",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "poolLPToken",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "stable",
+						"type": "address"
+					},
+					{
+						"internalType": "address[]",
+						"name": "tokens",
+						"type": "address[]"
+					},
+					{
+						"internalType": "address",
+						"name": "stableYieldAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "coefficientA",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "coefficientB",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "coefficientC",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "lpBuyFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "lpSellFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "royaltiesBuyFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "royaltiesSellFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "protocolBuyRatio",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "protocolSellRatio",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "royaltiesBalance",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "protocolBalance",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "royaltiesAddress",
+								"type": "address"
+							},
+							{
+								"internalType": "address",
+								"name": "protocolFeeAddress",
+								"type": "address"
+							}
+						],
+						"internalType": "struct DataTypes.PoolFee",
+						"name": "fee",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "poolTvlLimit",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "cooldown",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxDepositPercentage",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxWithdrawPercentage",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "minFeeMultiplier",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxFeeMultiplier",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint8",
+								"name": "addLiqMode",
+								"type": "uint8"
+							},
+							{
+								"internalType": "uint8",
+								"name": "removeLiqMode",
+								"type": "uint8"
+							},
+							{
+								"internalType": "bool",
+								"name": "onlyAdminProvisioning",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct DataTypes.LiquidityLimit",
+						"name": "liquidityLimit",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "minimumF",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint16",
+								"name": "maxBulkStepSize",
+								"type": "uint16"
+							},
+							{
+								"internalType": "uint16",
+								"name": "iterations",
+								"type": "uint16"
+							}
+						],
+						"internalType": "struct DataTypes.IterativeLimit",
+						"name": "iterativeLimit",
+						"type": "tuple"
+					}
+				],
+				"internalType": "struct DataTypes.PoolData",
+				"name": "newPoolData",
+				"type": "tuple"
+			}
+		],
+		"name": "setPoolData",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "minimumF",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint16",
+						"name": "maxBulkStepSize",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "iterations",
+						"type": "uint16"
+					}
+				],
+				"internalType": "struct DataTypes.IterativeLimit",
+				"name": "newLimits",
+				"type": "tuple"
+			}
+		],
+		"name": "setPoolIterativeLimits",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "poolTvlLimit",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "cooldown",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxDepositPercentage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxWithdrawPercentage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minFeeMultiplier",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxFeeMultiplier",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint8",
+						"name": "addLiqMode",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint8",
+						"name": "removeLiqMode",
+						"type": "uint8"
+					},
+					{
+						"internalType": "bool",
+						"name": "onlyAdminProvisioning",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct DataTypes.LiquidityLimit",
+				"name": "newLimits",
+				"type": "tuple"
+			}
+		],
+		"name": "setPoolLiquidityLimits",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "yieldReserve",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
