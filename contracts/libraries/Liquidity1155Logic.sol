@@ -600,7 +600,94 @@ library Liquidity1155Logic {
         }
     }
 
-    /** @dev Experimental Function to the swap stablecoins to shares using grouping by subpools
+    /** @dev Function to the swap shares to stablecoins using grouping by subpools
+     * @notice subPoolGroupsPointer should be cleared by making it "1" after each iteration of the grouping
+     * @param user The user address to transfer the shares from
+     * @param  minStable The minimum stablecoins to receive
+     * @param  yieldReserve The current reserve in yield contracts
+     * @param  params The shares arrays to deduct (token ids, amounts)
+     * @param poolData The pool data including fee configuration
+     * @param subPools the subpools array of the liquidity pool
+     * @param tokenDistribution the token distribution of the liquidity pool
+     */
+    function swapShares(
+        address user,
+        uint256 minStable,
+        uint256 yieldReserve,
+        DataTypes.Shares1155Params memory params,
+        DataTypes.PoolData storage poolData,
+        DataTypes.AMMSubPool1155[] storage subPools,
+        mapping(uint256 => uint256) storage tokenDistribution
+    ) external {
+        require(params.tokenIds.length == params.amounts.length, Errors.ARRAY_NOT_SAME_LENGTH);
+
+        DataTypes.SwapLocalVars memory vars;
+        (vars.subPoolGroups, vars.counter) = groupBySubpoolDynamic(params, subPools.length, tokenDistribution);
+        //Check how much stablecoins remaining in the pool excluding yield investment
+        require(IERC20(poolData.stable).balanceOf(poolData.poolLPToken) - yieldReserve >= minStable, Errors.NOT_ENOUGH_POOL_RESERVE);
+        //Get the grouped token ids by subpool
+        for (vars.i = 0; vars.i < vars.counter; vars.i++) {
+            vars.currentSubPool = vars.subPoolGroups[vars.i];
+            vars.poolId = vars.currentSubPool.id;
+            require(
+                subPools[vars.poolId].F >= poolData.iterativeLimit.minimumF,
+                Errors.SWAPPING_SHARES_TEMPORARY_DISABLED_DUE_TO_LOW_CONDITIONS
+            );
+            require(subPools[vars.poolId].status == true, Errors.SUBPOOL_DISABLED);
+            //Calculate the value of the shares inside this group
+            vars.currentSubPool.sharesCal = Pool1155Logic.CalculateShares(
+                DataTypes.OperationType.sellShares,
+                subPools,
+                vars.poolId,
+                poolData,
+                vars.currentSubPool.total,
+                true
+            );
+            vars.stable =
+                vars.currentSubPool.sharesCal.value -
+                vars.currentSubPool.sharesCal.fees.royalties -
+                vars.currentSubPool.sharesCal.fees.protocolFee;
+            //Skip this subpool if there isn't enough
+            //The pricing depends on all the shares together, otherwise we need to break them and re-iterate (future feature)
+            require(vars.currentSubPool.sharesCal.value <= subPools[vars.poolId].reserve, Errors.NOT_ENOUGH_SUBPOOL_RESERVE);
+
+            vars.stableOut += vars.stable;
+            //add the total fees for emitting the event
+            vars.fees = Pool1155Logic.addFees(vars.fees, vars.currentSubPool.sharesCal.fees);
+            //Update the reserve of stable and shares and F
+            subPools[vars.poolId].reserve -= (vars.currentSubPool.sharesCal.value);
+            subPools[vars.poolId].totalShares += vars.currentSubPool.total;
+            subPools[vars.poolId].F = vars.currentSubPool.sharesCal.F;
+            //Iterate through the shares inside the Group
+            for (vars.y = 0; vars.y < vars.currentSubPool.counter; vars.y++) {
+                vars.currentShare = vars.currentSubPool.shares[vars.y];
+                subPools[vars.poolId].shares[vars.currentShare.tokenId] += vars.currentShare.amount;
+                //Transfer the tokens
+                //We cant transfer batch outside the loop since the array of token ids and amounts have a counter after grouping
+                //To generate proper token ids and amounts arrays for transfer batch, the groupBySubpoolDynamic will be redesigned and cost more gas
+                //Even if grouped and the transfer is outside the current for loop, there is still another for loop due to economy of scale approach
+                IERC1155(poolData.tokens[0]).safeTransferFrom(
+                    user,
+                    poolData.poolLPToken,
+                    vars.currentShare.tokenId,
+                    vars.currentShare.amount,
+                    ""
+                );
+            }
+        }
+        require(vars.stableOut >= minStable, Errors.SHARES_VALUE_BELOW_TARGET);
+        if (vars.stableOut > 0) {
+            //Add to the balances of the protocol wallet and royalties address
+            poolData.fee.protocolBalance += vars.fees.protocolFee;
+            poolData.fee.royaltiesBalance += vars.fees.royalties;
+            //Transfer the total stable to the user
+            ILPToken(poolData.poolLPToken).setApproval20(poolData.stable, vars.stableOut);
+            IERC20(poolData.stable).transferFrom(poolData.poolLPToken, user, vars.stableOut);
+        }
+        emit SwappedShares(vars.stableOut, vars.fees, user, vars.subPoolGroups);
+    }
+
+    /** @dev Function to the swap stablecoins to shares using grouping by subpools
      * @param user The user address to deduct stablecoins
      * @param maxStable the maximum stablecoins to deduct
      * @param  params The shares arrays (token ids, amounts)
@@ -688,90 +775,4 @@ library Liquidity1155Logic {
         emit SwappedStable(maxStable - vars.remaining, vars.fees, user, vars.subPoolGroups);
     }
 
-    /** @dev Experimental Function to the swap shares to stablecoins using grouping by subpools
-     * @notice subPoolGroupsPointer should be cleared by making it "1" after each iteration of the grouping
-     * @param user The user address to transfer the shares from
-     * @param  minStable The minimum stablecoins to receive
-     * @param  yieldReserve The current reserve in yield contracts
-     * @param  params The shares arrays to deduct (token ids, amounts)
-     * @param poolData The pool data including fee configuration
-     * @param subPools the subpools array of the liquidity pool
-     * @param tokenDistribution the token distribution of the liquidity pool
-     */
-    function swapShares(
-        address user,
-        uint256 minStable,
-        uint256 yieldReserve,
-        DataTypes.Shares1155Params memory params,
-        DataTypes.PoolData storage poolData,
-        DataTypes.AMMSubPool1155[] storage subPools,
-        mapping(uint256 => uint256) storage tokenDistribution
-    ) external {
-        require(params.tokenIds.length == params.amounts.length, Errors.ARRAY_NOT_SAME_LENGTH);
-
-        DataTypes.SwapLocalVars memory vars;
-        (vars.subPoolGroups, vars.counter) = groupBySubpoolDynamic(params, subPools.length, tokenDistribution);
-        //Check how much stablecoins remaining in the pool excluding yield investment
-        require(IERC20(poolData.stable).balanceOf(poolData.poolLPToken) - yieldReserve >= minStable, Errors.NOT_ENOUGH_POOL_RESERVE);
-        //Get the grouped token ids by subpool
-        for (vars.i = 0; vars.i < vars.counter; vars.i++) {
-            vars.currentSubPool = vars.subPoolGroups[vars.i];
-            vars.poolId = vars.currentSubPool.id;
-            require(
-                subPools[vars.poolId].F >= poolData.iterativeLimit.minimumF,
-                Errors.SWAPPING_SHARES_TEMPORARY_DISABLED_DUE_TO_LOW_CONDITIONS
-            );
-            require(subPools[vars.poolId].status == true, Errors.SUBPOOL_DISABLED);
-            //Calculate the value of the shares inside this group
-            vars.currentSubPool.sharesCal = Pool1155Logic.CalculateShares(
-                DataTypes.OperationType.sellShares,
-                subPools,
-                vars.poolId,
-                poolData,
-                vars.currentSubPool.total,
-                true
-            );
-            vars.stable =
-                vars.currentSubPool.sharesCal.value -
-                vars.currentSubPool.sharesCal.fees.royalties -
-                vars.currentSubPool.sharesCal.fees.protocolFee;
-            //Skip this subpool if there isn't enough
-            //The pricing depends on all the shares together, otherwise we need to break them and re-iterate (future feature)
-            require(vars.currentSubPool.sharesCal.value <= subPools[vars.poolId].reserve, Errors.NOT_ENOUGH_SUBPOOL_RESERVE);
-
-            vars.stableOut += vars.stable;
-            //add the total fees for emitting the event
-            vars.fees = Pool1155Logic.addFees(vars.fees, vars.currentSubPool.sharesCal.fees);
-            //Update the reserve of stable and shares and F
-            subPools[vars.poolId].reserve -= (vars.currentSubPool.sharesCal.value);
-            subPools[vars.poolId].totalShares += vars.currentSubPool.total;
-            subPools[vars.poolId].F = vars.currentSubPool.sharesCal.F;
-            //Iterate through the shares inside the Group
-            for (vars.y = 0; vars.y < vars.currentSubPool.counter; vars.y++) {
-                vars.currentShare = vars.currentSubPool.shares[vars.y];
-                subPools[vars.poolId].shares[vars.currentShare.tokenId] += vars.currentShare.amount;
-                //Transfer the tokens
-                //We cant transfer batch outside the loop since the array of token ids and amounts have a counter after grouping
-                //To generate proper token ids and amounts arrays for transfer batch, the groupBySubpoolDynamic will be redesigned and cost more gas
-                //Even if grouped and the transfer is outside the current for loop, there is still another for loop due to economy of scale approach
-                IERC1155(poolData.tokens[0]).safeTransferFrom(
-                    user,
-                    poolData.poolLPToken,
-                    vars.currentShare.tokenId,
-                    vars.currentShare.amount,
-                    ""
-                );
-            }
-        }
-        require(vars.stableOut >= minStable, Errors.SHARES_VALUE_BELOW_TARGET);
-        if (vars.stable > 0) {
-            //Add to the balances of the protocol wallet and royalties address
-            poolData.fee.protocolBalance += vars.fees.protocolFee;
-            poolData.fee.royaltiesBalance += vars.fees.royalties;
-            //Transfer the total stable to the user
-            ILPToken(poolData.poolLPToken).setApproval20(poolData.stable, vars.stable);
-            IERC20(poolData.stable).transferFrom(poolData.poolLPToken, user, vars.stable);
-        }
-        emit SwappedShares(vars.stable, vars.fees, user, vars.subPoolGroups);
-    }
 }
