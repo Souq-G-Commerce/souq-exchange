@@ -1,10 +1,11 @@
 import "@nomicfoundation/hardhat-toolbox";
+import "@openzeppelin/hardhat-upgrades";
 import { config as dotenvConfig } from "dotenv";
 import "hardhat-deploy";
 import type { HardhatUserConfig } from "hardhat/config";
 import type { NetworkUserConfig } from "hardhat/types";
-import '@openzeppelin/hardhat-upgrades';
 import { resolve } from "path";
+
 require("hardhat-tracer");
 require("hardhat-contract-sizer");
 
@@ -21,7 +22,8 @@ const alchemyApiKey: string | undefined = process.env.ALCHEMY_API_KEY;
 if (!alchemyApiKey) {
   throw new Error("Please set your ALCHEMY_API_KEY in a .env file");
 }
-const alchemyMainnetApiKey: string | undefined = process.env.ALCHEMY_MAINNET_API_KEY;
+const alchemyMainnetApiKey: string | undefined =
+  process.env.ALCHEMY_MAINNET_API_KEY;
 if (!alchemyMainnetApiKey) {
   throw new Error("Please set your ALCHEMY_MAINNET_API_KEY in a .env file");
 }
@@ -30,8 +32,7 @@ let privateKey: string = "";
 const privateKeyRaw: string | undefined = process.env.PRIVATE_KEY;
 if (!privateKeyRaw) {
   throw new Error("Please set your PRIVATE_KEY in a .env file");
-}else
-{
+} else {
   privateKey = privateKeyRaw;
 }
 const chainIds = {
@@ -48,9 +49,10 @@ function getChainConfig(chain: keyof typeof chainIds): NetworkUserConfig {
     case "goerli":
       jsonRpcUrl = "https://eth-goerli.g.alchemy.com/v2/" + alchemyApiKey;
       break;
-      case "mainnet":
-        jsonRpcUrl = "https://eth-mainnet.g.alchemy.com/v2/" + alchemyMainnetApiKey;
-        break;
+    case "mainnet":
+      jsonRpcUrl =
+        "https://eth-mainnet.g.alchemy.com/v2/" + alchemyMainnetApiKey;
+      break;
     default:
       jsonRpcUrl = "https://" + chain + ".g.alchemy.com/v2/" + alchemyApiKey;
   }
@@ -71,8 +73,8 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
-      goerli:process.env.ETHERSCAN_API_KEY || "",
-      mainnet:process.env.ETHERSCAN_API_KEY || ""
+      goerli: process.env.ETHERSCAN_API_KEY || "",
+      mainnet: process.env.ETHERSCAN_API_KEY || "",
     },
   },
   gasReporter: {
@@ -83,11 +85,11 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
-        forking:{
-          blockNumber: 16889989,
-          enabled: true,
-          url: "https://mainnet.infura.io/v3/81225b20a74b46aa8f87b382d5cb1dfb",
-        },
+      forking: {
+        blockNumber: 16889989,
+        enabled: true,
+        url: "https://mainnet.infura.io/v3/81225b20a74b46aa8f87b382d5cb1dfb",
+      },
       accounts: {
         mnemonic,
       },
@@ -117,11 +119,12 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 200,
         details: {
-          "yul": true,
+          yul: true,
           yulDetails: {
-            optimizerSteps: 'dhfoDgvulfnTUtnIf [xa[r]scLM cCTUtTOntnfDIul Lcul Vcul [j] Tpeul xa[rul] xa[r]cL gvif CTUca[r]LsTOtfDnca[r]Iulc] jmul[jul] VcTOcul jmul'
+            optimizerSteps:
+              "dhfoDgvulfnTUtnIf [xa[r]scLM cCTUtTOntnfDIul Lcul Vcul [j] Tpeul xa[rul] xa[r]cL gvif CTUca[r]LsTOtfDnca[r]Iulc] jmul[jul] VcTOcul jmul",
           },
-        }
+        },
       },
     },
   },

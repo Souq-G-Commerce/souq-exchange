@@ -68,7 +68,7 @@ contract PoolFactory1155 is IPoolFactory1155, Initializable, UUPSUpgradeable, Pr
     }
 
     /// @inheritdoc IPoolFactory1155
-    function setFeeConfig(DataTypes.FactoryFeeConfig memory newConfig) external onlyPoolAdmin { 
+    function setFeeConfig(DataTypes.FactoryFeeConfig memory newConfig) external onlyPoolAdmin {
         feeConfig = newConfig;
         emit FeeConfigSet(msg.sender, feeConfig);
     }
@@ -148,7 +148,7 @@ contract PoolFactory1155 is IPoolFactory1155, Initializable, UUPSUpgradeable, Pr
      * @param newImplementation The new implementation contract address used for the upgrade.
      */
     function _authorizeUpgrade(address newImplementation) internal override onlyUpgrader {
-        require(newImplementation != address(0),Errors.ADDRESS_IS_ZERO);
+        require(newImplementation != address(0), Errors.ADDRESS_IS_ZERO);
         version++;
     }
 }

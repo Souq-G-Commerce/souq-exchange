@@ -69,10 +69,7 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
      */
     modifier timelockOnly() {
         if (IAddressesRegistry(addressesRegistry).getAddress("TIMELOCK") != address(0)) {
-            require(
-                IAddressesRegistry(addressesRegistry).getAddress("TIMELOCK") == msg.sender,
-                Errors.CALLER_NOT_TIMELOCK
-            );
+            require(IAddressesRegistry(addressesRegistry).getAddress("TIMELOCK") == msg.sender, Errors.CALLER_NOT_TIMELOCK);
         }
         _;
     }
@@ -84,10 +81,7 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
      */
     modifier useAccessNFT(uint256 tokenId, string memory functionName) {
         if (poolData.useAccessToken) {
-            require(
-                IAccessNFT(poolData.accessToken).HasAccessNFT(msg.sender, tokenId, functionName),
-                Errors.FUNCTION_REQUIRES_ACCESS_NFT
-            );
+            require(IAccessNFT(poolData.accessToken).HasAccessNFT(msg.sender, tokenId, functionName), Errors.FUNCTION_REQUIRES_ACCESS_NFT);
         }
         _;
     }
@@ -279,7 +273,6 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
     function moveSharesList(uint256 newSubPoolIds, uint256[] calldata ids) external onlyPoolAdminOrOperations {
         Pool1155Logic.moveSharesList(newSubPoolIds, ids, subPools, poolData, tokenDistribution);
     }
-
 
     /// @inheritdoc IMME1155
     function depositIntoStableYield(uint256 amount) external onlyPoolAdmin {

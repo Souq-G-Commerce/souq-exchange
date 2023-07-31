@@ -145,9 +145,9 @@ library Liquidity1155Logic {
     ) external {
         require(Pool1155Logic.calculateTotal(subPools, subPoolId) == 0, "SUBPOOL_NOT_EMPTY");
         for (uint256 i = 0; i < params.tokenIds.length; i++) {
-        require(tokenDistribution[params.tokenIds[i]] == subPoolId, "NOT_SAME_SUBPOOL_DISTRIBUTION");
-        subPools[subPoolId].shares[params.tokenIds[i]] += params.amounts[i];
-        subPools[subPoolId].totalShares += params.amounts[i];
+            require(tokenDistribution[params.tokenIds[i]] == subPoolId, "NOT_SAME_SUBPOOL_DISTRIBUTION");
+            subPools[subPoolId].shares[params.tokenIds[i]] += params.amounts[i];
+            subPools[subPoolId].totalShares += params.amounts[i];
         }
         IERC1155(poolData.tokens[0]).safeBatchTransferFrom(user, poolData.poolLPToken, params.tokenIds, params.amounts, "");
         subPools[subPoolId].reserve += stableIn;
@@ -774,5 +774,4 @@ library Liquidity1155Logic {
         IERC20(poolData.stable).transferFrom(user, poolData.poolLPToken, maxStable - vars.remaining);
         emit SwappedStable(maxStable - vars.remaining, vars.fees, user, vars.subPoolGroups);
     }
-
 }

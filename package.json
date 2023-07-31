@@ -1,10 +1,10 @@
 {
-  "name": "hardhat-template-alchemy",
-  "description": "Hardhat template with alchemy",
+  "name": "souq-nft-amm-v1",
+  "description": "Souq NFT AMM v1",
   "version": "1.0.0",
   "author": {
-    "name": "Ahmad Kadri",
-    "url": "https://github.com/elkadro"
+    "name": "Souq Dev Team",
+    "url": "https://souq.finance"
   },
   "engines": {
     "node": "16.18.1",
