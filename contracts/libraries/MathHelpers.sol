@@ -20,10 +20,6 @@ library MathHelpers {
         z = x.div(10 ** 18);
     }
 
-    function convertFromWadSqrd(uint256 x) internal pure returns (uint256 z) {
-        z = x.div(10 ** 36);
-    }
-
     function convertToWadPercentage(uint256 x) internal pure returns (uint256 z) {
         z = x.mul(10 ** 20);
     }

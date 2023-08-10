@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.10;
 
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {Pool1155Logic} from "./Pool1155Logic.sol";
 import {MathHelpers} from "../libraries/MathHelpers.sol";
@@ -18,6 +19,7 @@ import {ILPToken} from "../interfaces/ILPToken.sol";
  */
 
 library Liquidity1155Logic {
+    using SafeERC20 for IERC20;
     using Math for uint256;
     using Pool1155Logic for DataTypes.AMMSubPool1155[];
     /**
@@ -115,7 +117,7 @@ library Liquidity1155Logic {
         uint256 remaining = amount;
         uint256 weighted = 0;
         //Iterate through the subpools and add liquidity in a weighted manner and the remainder goes to the last subpool
-        for (uint256 i = 0; i < subPools.length; i++) {
+        for (uint256 i = 0; i < subPools.length; ++i) {
             if (subPools[i].status) {
                 if (i == subPools.length - 1) {
                     subPools[i].reserve += remaining;
@@ -144,20 +146,20 @@ library Liquidity1155Logic {
         mapping(uint256 => uint256) storage tokenDistribution
     ) external {
         require(Pool1155Logic.calculateTotal(subPools, subPoolId) == 0, "SUBPOOL_NOT_EMPTY");
-        for (uint256 i = 0; i < params.tokenIds.length; i++) {
-        require(tokenDistribution[params.tokenIds[i]] == subPoolId, "NOT_SAME_SUBPOOL_DISTRIBUTION");
-        subPools[subPoolId].shares[params.tokenIds[i]] += params.amounts[i];
-        subPools[subPoolId].totalShares += params.amounts[i];
+        for (uint256 i = 0; i < params.tokenIds.length; ++i) {
+            require(tokenDistribution[params.tokenIds[i]] == subPoolId, "NOT_SAME_SUBPOOL_DISTRIBUTION");
+            subPools[subPoolId].shares[params.tokenIds[i]] += params.amounts[i];
+            subPools[subPoolId].totalShares += params.amounts[i];
         }
-        IERC1155(poolData.tokens[0]).safeBatchTransferFrom(user, poolData.poolLPToken, params.tokenIds, params.amounts, "");
         subPools[subPoolId].reserve += stableIn;
         Pool1155Logic.updatePriceIterative(subPools, poolData, subPoolId);
-        IERC20(poolData.stable).transferFrom(user, poolData.poolLPToken, stableIn);
+        emit DepositInitiated(user, subPoolId, stableIn, params, subPools[subPoolId].totalShares, subPools[subPoolId].F);
+        IERC1155(poolData.tokens[0]).safeBatchTransferFrom(user, poolData.poolLPToken, params.tokenIds, params.amounts, "");
+        IERC20(poolData.stable).safeTransferFrom(user, poolData.poolLPToken, stableIn);
         ILPToken(poolData.poolLPToken).mint(
             user,
             MathHelpers.convertToWad(Pool1155Logic.calculateTotal(subPools, subPoolId)) / subPools.getLPPrice(poolData.poolLPToken)
         );
-        emit DepositInitiated(user, subPoolId, stableIn, params, subPools[subPoolId].totalShares, subPools[subPoolId].F);
     }
 
     /**
@@ -198,9 +200,9 @@ library Liquidity1155Logic {
         }
         distributeLiquidityToAll(vars.stable, vars.TVL, poolData, subPools);
 
-        IERC20(poolData.stable).transferFrom(user, poolData.poolLPToken, vars.stable);
-        ILPToken(poolData.poolLPToken).mint(user, vars.LPAmount);
         emit AddedLiqStable(vars.stable, vars.LPAmount, user);
+        IERC20(poolData.stable).safeTransferFrom(user, poolData.poolLPToken, vars.stable);
+        ILPToken(poolData.poolLPToken).mint(user, vars.LPAmount);
         return (vars.stable, vars.LPAmount);
     }
 
@@ -241,10 +243,10 @@ library Liquidity1155Logic {
 
         vars.remainingLP = targetLP;
         (vars.subPoolGroups, vars.counter) = groupBySubpoolDynamic(params, subPools.length, tokenDistribution);
-        for (vars.i = 0; vars.i < vars.counter; vars.i++) {
+        for (vars.i; vars.i < vars.counter; ++vars.i) {
             vars.currentSubPool = vars.subPoolGroups[vars.i];
             vars.poolId = vars.currentSubPool.id;
-            require(subPools[vars.poolId].status == true, Errors.SUBPOOL_DISABLED);
+            require(subPools[vars.poolId].status, Errors.SUBPOOL_DISABLED);
             require(
                 subPools[vars.poolId].F >= poolData.iterativeLimit.minimumF,
                 Errors.ADDING_SHARES_TEMPORARY_DISABLED_DUE_TO_LOW_CONDITIONS
@@ -263,7 +265,7 @@ library Liquidity1155Logic {
             subPools[vars.poolId].totalShares += vars.currentSubPool.total;
             subPools[vars.poolId].F = vars.currentSubPool.sharesCal.F;
 
-            for (vars.y = 0; vars.y < vars.currentSubPool.counter; vars.y++) {
+            for (vars.y = 0; vars.y < vars.currentSubPool.counter; ++vars.y) {
                 vars.currentShare = vars.currentSubPool.shares[vars.y];
                 subPools[vars.poolId].shares[vars.currentShare.tokenId] += vars.currentShare.amount;
                 //Transfer the share tokens
@@ -283,8 +285,8 @@ library Liquidity1155Logic {
             }
         }
         vars.LPAmount = targetLP - vars.remainingLP;
-        ILPToken(poolData.poolLPToken).mint(user, vars.LPAmount);
         emit AddedLiqShares(vars.LPAmount, user, vars.subPoolGroups);
+        ILPToken(poolData.poolLPToken).mint(user, vars.LPAmount);
         return (vars.LPAmount);
     }
 
@@ -293,6 +295,7 @@ library Liquidity1155Logic {
      * @param user The account to remove LP from
      * @param yieldReserve The current reserve deposited in yield generators
      * @param targetLP The amount of LPs to be burned
+     * @param minStable The minimum stable tokens to receive
      * @param poolData The liquidity pool data structure
      * @param subPools The subpools array
      * @param queuedWithdrawals The queued withdrawals
@@ -301,6 +304,7 @@ library Liquidity1155Logic {
         address user,
         uint256 yieldReserve,
         uint256 targetLP,
+        uint256 minStable,
         DataTypes.PoolData storage poolData,
         DataTypes.AMMSubPool1155[] storage subPools,
         DataTypes.Queued1155Withdrawals storage queuedWithdrawals
@@ -314,7 +318,7 @@ library Liquidity1155Logic {
         vars.stableRemaining = IERC20(poolData.stable).balanceOf(poolData.poolLPToken) - yieldReserve;
         //Calculate maximum LP Tokens to remove
         vars.remainingLP = targetLP.min(MathHelpers.convertToWad(vars.stableRemaining) / vars.LPPrice);
-        for (vars.i = 0; vars.i < subPools.length; vars.i++) {
+        for (vars.i; vars.i < subPools.length; ++vars.i) {
             if (subPools[vars.i].status) {
                 vars.weighted = vars.remainingLP.min((targetLP * Pool1155Logic.calculateTotal(subPools, vars.i)) / vars.TVL);
                 vars.stable = MathHelpers.convertFromWad(vars.weighted * vars.LPPrice);
@@ -326,10 +330,12 @@ library Liquidity1155Logic {
             }
         }
         vars.LPAmount = targetLP - vars.remainingLP;
+        require(vars.stableTotal >= minStable, Errors.LP_VALUE_BELOW_TARGET);
+        emit RemovedLiqStable(vars.stableTotal, vars.LPAmount, user, poolData.liquidityLimit.cooldown > 0 ? true : false);
         //If there is a cooldown, then store the stable in an array in the user data to be released later
         if (poolData.liquidityLimit.cooldown == 0) {
             ILPToken(poolData.poolLPToken).setApproval20(poolData.stable, vars.stableTotal);
-            IERC20(poolData.stable).transferFrom(poolData.poolLPToken, user, vars.stableTotal);
+            IERC20(poolData.stable).safeTransferFrom(poolData.poolLPToken, user, vars.stableTotal);
         } else {
             DataTypes.Withdraw1155Data storage current = queuedWithdrawals.withdrawals[queuedWithdrawals.nextId];
             current.to = user;
@@ -337,10 +343,9 @@ library Liquidity1155Logic {
             //See: https://ethereum.stackexchange.com/questions/11060/what-is-block-timestamp/11072#11072
             current.unlockTimestamp = block.timestamp + poolData.liquidityLimit.cooldown;
             current.amount = vars.stableTotal;
-            queuedWithdrawals.nextId++;
+            ++queuedWithdrawals.nextId;
         }
         ILPToken(poolData.poolLPToken).burn(user, vars.LPAmount);
-        emit RemovedLiqStable(vars.stableTotal, vars.LPAmount, user, poolData.liquidityLimit.cooldown > 0 ? true : false);
         return (vars.stableTotal, vars.LPAmount);
     }
 
@@ -375,10 +380,10 @@ library Liquidity1155Logic {
         //Get the grouped token ids by subpool
         (vars.subPoolGroups, vars.counter) = groupBySubpoolDynamic(params, subPools.length, tokenDistribution);
         //iterate the subpool groups
-        for (vars.i = 0; vars.i < vars.counter; vars.i++) {
+        for (vars.i; vars.i < vars.counter; ++vars.i) {
             vars.currentSubPool = vars.subPoolGroups[vars.i];
             vars.poolId = vars.currentSubPool.id;
-            require(subPools[vars.poolId].status == true, Errors.SUBPOOL_DISABLED);
+            require(subPools[vars.poolId].status, Errors.SUBPOOL_DISABLED);
             //Calculate the value of the shares inside this group
             vars.currentSubPool.sharesCal = Pool1155Logic.CalculateShares(
                 DataTypes.OperationType.buyShares,
@@ -395,7 +400,7 @@ library Liquidity1155Logic {
             subPools[vars.poolId].totalShares -= params.amounts[vars.i];
             subPools[vars.poolId].F = vars.currentSubPool.sharesCal.F;
 
-            for (vars.y = 0; vars.y < vars.currentSubPool.counter; vars.y++) {
+            for (vars.y = 0; vars.y < vars.currentSubPool.counter; ++vars.y) {
                 vars.currentShare = vars.currentSubPool.shares[vars.y];
                 require(
                     subPools[vars.poolId].shares[vars.currentShare.tokenId] >= vars.currentShare.amount,
@@ -426,12 +431,12 @@ library Liquidity1155Logic {
             //See: https://ethereum.stackexchange.com/questions/11060/what-is-block-timestamp/11072#11072
             queuedWithdrawals.withdrawals[queuedWithdrawals.nextId].unlockTimestamp = block.timestamp + poolData.liquidityLimit.cooldown;
             queuedWithdrawals.withdrawals[queuedWithdrawals.nextId].shares = queuedShares;
-            queuedWithdrawals.nextId++;
+            ++queuedWithdrawals.nextId;
         }
         vars.LPAmount = targetLP - vars.remainingLP;
+        emit RemovedLiqShares(vars.LPAmount, user, poolData.liquidityLimit.cooldown > 0 ? true : false, vars.subPoolGroups);
         //Burn the LP Token
         ILPToken(poolData.poolLPToken).burn(user, vars.LPAmount);
-        emit RemovedLiqShares(vars.LPAmount, user, poolData.liquidityLimit.cooldown > 0 ? true : false, vars.subPoolGroups);
         return (vars.LPAmount);
     }
 
@@ -448,16 +453,16 @@ library Liquidity1155Logic {
         DataTypes.PoolData storage poolData,
         DataTypes.Queued1155Withdrawals storage queuedWithdrawals
     ) external returns (uint256 transactions) {
-        for (uint256 i = 0; i < limit; i++) {
+        for (uint256 i; i < limit; ++i) {
             DataTypes.Withdraw1155Data storage current = queuedWithdrawals.withdrawals[queuedWithdrawals.headId];
             //Using block.timestamp is safer than block number
             //See: https://ethereum.stackexchange.com/questions/11060/what-is-block-timestamp/11072#11072
             if (current.unlockTimestamp < block.timestamp) break;
             if (current.amount > 0) {
                 ILPToken(poolData.poolLPToken).setApproval20(poolData.stable, current.amount);
-                IERC20(poolData.stable).transferFrom(poolData.poolLPToken, current.to, current.amount);
+                IERC20(poolData.stable).safeTransferFrom(poolData.poolLPToken, current.to, current.amount);
             }
-            for (uint256 j = 0; j < current.shares.length; j++) {
+            for (uint256 j = 0; j < current.shares.length; ++j) {
                 IERC1155(poolData.tokens[0]).safeTransferFrom(
                     poolData.poolLPToken,
                     current.to,
@@ -466,8 +471,8 @@ library Liquidity1155Logic {
                     ""
                 );
             }
-            transactions++;
-            queuedWithdrawals.headId++;
+            ++transactions;
+            ++queuedWithdrawals.headId;
         }
         if (queuedWithdrawals.nextId == queuedWithdrawals.headId) {
             queuedWithdrawals.nextId = 0;
@@ -507,14 +512,14 @@ library Liquidity1155Logic {
         } else {
             //First we create an array of same length of the params and fill it with the token ids, subpool ids and amounts
             vars.paramGroups = new DataTypes.ParamGroup[](params.tokenIds.length);
-            for (vars.i = 0; vars.i < params.tokenIds.length; vars.i++) {
+            for (vars.i; vars.i < params.tokenIds.length; ++vars.i) {
                 vars.paramGroups[vars.i].subPoolId = tokenDistribution[params.tokenIds[vars.i]];
                 vars.paramGroups[vars.i].amount = params.amounts[vars.i];
                 vars.paramGroups[vars.i].tokenId = params.tokenIds[vars.i];
             }
             //Then we sort the new array using the insertion method
-            for (vars.i = 1; vars.i < vars.paramGroups.length; vars.i++) {
-                for (uint j = 0; j < vars.i; j++)
+            for (vars.i = 1; vars.i < vars.paramGroups.length; ++vars.i) {
+                for (uint j = 0; j < vars.i; ++j)
                     if (vars.paramGroups[vars.i].subPoolId < vars.paramGroups[j].subPoolId) {
                         DataTypes.ParamGroup memory x = vars.paramGroups[vars.i];
                         vars.paramGroups[vars.i] = vars.paramGroups[j];
@@ -522,7 +527,7 @@ library Liquidity1155Logic {
                     }
             }
             //The we iterate last time through the array and construct the subpool group
-            for (vars.i = 0; vars.i < vars.paramGroups.length; vars.i++) {
+            for (vars.i = 0; vars.i < vars.paramGroups.length; ++vars.i) {
                 if (vars.i == 0 || vars.paramGroups[vars.i].subPoolId != vars.paramGroups[vars.i - 1].subPoolId) {
                     subPoolGroups[counter] = DataTypes.SubPoolGroup(
                         vars.paramGroups[vars.i].subPoolId,
@@ -531,7 +536,7 @@ library Liquidity1155Logic {
                         new DataTypes.AMMShare1155[](vars.paramGroups.length),
                         vars.cal
                     );
-                    counter++;
+                    ++counter;
                 }
                 vars.index = counter - 1;
                 subPoolGroups[vars.index].shares[subPoolGroups[vars.index].counter] = DataTypes.AMMShare1155(
@@ -539,7 +544,7 @@ library Liquidity1155Logic {
                     vars.paramGroups[vars.i].amount
                 );
                 subPoolGroups[vars.index].total += vars.paramGroups[vars.i].amount;
-                subPoolGroups[vars.index].counter++;
+                ++subPoolGroups[vars.index].counter;
             }
         }
     }
@@ -563,10 +568,10 @@ library Liquidity1155Logic {
         quotation.shares = new DataTypes.SharePrice[](params.tokenIds.length);
         //Get the grouped token ids by subpool
         (vars.subPoolGroups, vars.counter) = groupBySubpoolDynamic(params, subPools.length, tokenDistribution);
-        for (vars.i = 0; vars.i < vars.counter; vars.i++) {
+        for (vars.i; vars.i < vars.counter; ++vars.i) {
             vars.currentSubPool = vars.subPoolGroups[vars.i];
             vars.poolId = vars.currentSubPool.id;
-            require(subPools[vars.poolId].status == true, Errors.SUBPOOL_DISABLED);
+            require(subPools[vars.poolId].status, Errors.SUBPOOL_DISABLED);
             //Calculate the value of the shares from its subpool
             vars.currentSubPool.sharesCal = Pool1155Logic.CalculateShares(
                 quoteParams.buy ? DataTypes.OperationType.buyShares : DataTypes.OperationType.sellShares,
@@ -576,7 +581,7 @@ library Liquidity1155Logic {
                 vars.currentSubPool.total,
                 quoteParams.useFee
             );
-            for (vars.y = 0; vars.y < vars.currentSubPool.counter; vars.y++) {
+            for (vars.y = 0; vars.y < vars.currentSubPool.counter; ++vars.y) {
                 vars.currentShare = vars.currentSubPool.shares[vars.y];
                 require(
                     subPools[vars.poolId].shares[vars.currentShare.tokenId] >= vars.currentShare.amount || !quoteParams.buy,
@@ -589,7 +594,7 @@ library Liquidity1155Logic {
                     vars.currentShare.amount,
                     vars.currentSubPool.total
                 );
-                vars.counterShares++;
+                ++vars.counterShares;
             }
             quotation.fees = Pool1155Logic.addFees(quotation.fees, vars.subPoolGroups[vars.i].sharesCal.fees);
             require(
@@ -600,7 +605,7 @@ library Liquidity1155Logic {
         }
     }
 
-    /** @dev Function to the swap shares to stablecoins using grouping by subpools
+    /** @dev Experimental Function to the swap shares to stablecoins using grouping by subpools
      * @notice subPoolGroupsPointer should be cleared by making it "1" after each iteration of the grouping
      * @param user The user address to transfer the shares from
      * @param  minStable The minimum stablecoins to receive
@@ -626,14 +631,14 @@ library Liquidity1155Logic {
         //Check how much stablecoins remaining in the pool excluding yield investment
         require(IERC20(poolData.stable).balanceOf(poolData.poolLPToken) - yieldReserve >= minStable, Errors.NOT_ENOUGH_POOL_RESERVE);
         //Get the grouped token ids by subpool
-        for (vars.i = 0; vars.i < vars.counter; vars.i++) {
+        for (vars.i; vars.i < vars.counter; ++vars.i) {
             vars.currentSubPool = vars.subPoolGroups[vars.i];
             vars.poolId = vars.currentSubPool.id;
             require(
                 subPools[vars.poolId].F >= poolData.iterativeLimit.minimumF,
                 Errors.SWAPPING_SHARES_TEMPORARY_DISABLED_DUE_TO_LOW_CONDITIONS
             );
-            require(subPools[vars.poolId].status == true, Errors.SUBPOOL_DISABLED);
+            require(subPools[vars.poolId].status, Errors.SUBPOOL_DISABLED);
             //Calculate the value of the shares inside this group
             vars.currentSubPool.sharesCal = Pool1155Logic.CalculateShares(
                 DataTypes.OperationType.sellShares,
@@ -659,7 +664,7 @@ library Liquidity1155Logic {
             subPools[vars.poolId].totalShares += vars.currentSubPool.total;
             subPools[vars.poolId].F = vars.currentSubPool.sharesCal.F;
             //Iterate through the shares inside the Group
-            for (vars.y = 0; vars.y < vars.currentSubPool.counter; vars.y++) {
+            for (vars.y = 0; vars.y < vars.currentSubPool.counter; ++vars.y) {
                 vars.currentShare = vars.currentSubPool.shares[vars.y];
                 subPools[vars.poolId].shares[vars.currentShare.tokenId] += vars.currentShare.amount;
                 //Transfer the tokens
@@ -677,17 +682,17 @@ library Liquidity1155Logic {
         }
         require(vars.stableOut >= minStable, Errors.SHARES_VALUE_BELOW_TARGET);
         if (vars.stableOut > 0) {
+            emit SwappedShares(vars.stableOut, vars.fees, user, vars.subPoolGroups);
             //Add to the balances of the protocol wallet and royalties address
             poolData.fee.protocolBalance += vars.fees.protocolFee;
             poolData.fee.royaltiesBalance += vars.fees.royalties;
             //Transfer the total stable to the user
             ILPToken(poolData.poolLPToken).setApproval20(poolData.stable, vars.stableOut);
-            IERC20(poolData.stable).transferFrom(poolData.poolLPToken, user, vars.stableOut);
+            IERC20(poolData.stable).safeTransferFrom(poolData.poolLPToken, user, vars.stableOut);
         }
-        emit SwappedShares(vars.stableOut, vars.fees, user, vars.subPoolGroups);
     }
 
-    /** @dev Function to the swap stablecoins to shares using grouping by subpools
+    /** @dev Experimental Function to the swap stablecoins to shares using grouping by subpools
      * @param user The user address to deduct stablecoins
      * @param maxStable the maximum stablecoins to deduct
      * @param  params The shares arrays (token ids, amounts)
@@ -711,10 +716,10 @@ library Liquidity1155Logic {
         //Get the grouped token ids by subpool
         (vars.subPoolGroups, vars.counter) = groupBySubpoolDynamic(params, subPools.length, tokenDistribution);
         //iterate the subpool groups
-        for (vars.i = 0; vars.i < vars.counter; vars.i++) {
+        for (vars.i; vars.i < vars.counter; ++vars.i) {
             vars.currentSubPool = vars.subPoolGroups[vars.i];
             vars.poolId = vars.currentSubPool.id;
-            require(subPools[vars.poolId].status == true, Errors.SUBPOOL_DISABLED);
+            require(subPools[vars.poolId].status, Errors.SUBPOOL_DISABLED);
             //Calculate the value of the shares inside this group
             //This requires that the total shares in the subpool >= amount requested or it reverts
             vars.currentSubPool.sharesCal = Pool1155Logic.CalculateShares(
@@ -747,7 +752,7 @@ library Liquidity1155Logic {
             subPools[vars.poolId].totalShares -= vars.currentSubPool.total;
             subPools[vars.poolId].F = vars.currentSubPool.sharesCal.F;
             //Iterate through all the shares to update their new amounts in the subpool
-            for (vars.y = 0; vars.y < vars.currentSubPool.counter; vars.y++) {
+            for (vars.y = 0; vars.y < vars.currentSubPool.counter; ++vars.y) {
                 vars.currentShare = vars.currentSubPool.shares[vars.y];
                 require(
                     subPools[vars.poolId].shares[vars.currentShare.tokenId] >= vars.currentShare.amount,
@@ -770,9 +775,8 @@ library Liquidity1155Logic {
         //Add to the balances of the protocol wallet and royalties address
         poolData.fee.protocolBalance += vars.fees.protocolFee;
         poolData.fee.royaltiesBalance += vars.fees.royalties;
-        //Transfer the total stable from the user
-        IERC20(poolData.stable).transferFrom(user, poolData.poolLPToken, maxStable - vars.remaining);
         emit SwappedStable(maxStable - vars.remaining, vars.fees, user, vars.subPoolGroups);
+        //Transfer the total stable from the user
+        IERC20(poolData.stable).safeTransferFrom(user, poolData.poolLPToken, maxStable - vars.remaining);
     }
-
 }

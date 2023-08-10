@@ -8,10 +8,9 @@ import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol"
  * @title IAccessManager
  * @author Souq.Finance
  * @notice The interface for the Access Manager Contract
- * @notice License: https://souq-nft-amm-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-peripheral-v1.s3.amazonaws.com/LICENSE.md
  */
 interface IAccessManager is IAccessControl {
-    
     /**
      * @notice Returns the contract address of the PoolAddressesProvider
      * @return The address of the PoolAddressesProvider
@@ -79,12 +78,13 @@ interface IAccessManager is IAccessControl {
      * @param newAdmin The new default admin address
      */
     function changeDefaultAdmin(address newAdmin) external;
-    
+
     /**
      * @dev return the version of the contract
      * @return the version of the contract
      */
     function getVersion() external pure returns (uint256);
+
     /**
      * @notice Set the role as admin of a specific role.
      * @dev By default the admin role for all roles is `DEFAULT_ADMIN_ROLE`.

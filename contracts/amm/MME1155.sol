@@ -15,7 +15,7 @@ import {ILPToken} from "../interfaces/ILPToken.sol";
 import {IAddressesRegistry} from "../interfaces/IAddressesRegistry.sol";
 import {IAccessManager} from "../interfaces/IAccessManager.sol";
 import {IAccessNFT} from "../interfaces/IAccessNFT.sol";
-import {IERC20} from "../interfaces/IERC20.sol";
+import {IERC20Extended} from "../interfaces/IERC20Extended.sol";
 
 /**
  * @title MME1155
@@ -43,6 +43,7 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
     DataTypes.Queued1155Withdrawals public queuedWithdrawals;
 
     constructor(address _factory, address addressRegistry) AMMBase(addressRegistry) {
+        require(_factory != address(0), Errors.ADDRESS_IS_ZERO);
         factory = _factory;
     }
 
@@ -59,7 +60,7 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
             poolData.tokens,
             symbol,
             name,
-            IERC20(poolData.stable).decimals()
+            IERC20Extended(poolData.stable).decimals()
         );
         yieldReserve = 0;
     }
@@ -69,10 +70,7 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
      */
     modifier timelockOnly() {
         if (IAddressesRegistry(addressesRegistry).getAddress("TIMELOCK") != address(0)) {
-            require(
-                IAddressesRegistry(addressesRegistry).getAddress("TIMELOCK") == msg.sender,
-                Errors.CALLER_NOT_TIMELOCK
-            );
+            require(IAddressesRegistry(addressesRegistry).getAddress("TIMELOCK") == msg.sender, Errors.CALLER_NOT_TIMELOCK);
         }
         _;
     }
@@ -84,10 +82,7 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
      */
     modifier useAccessNFT(uint256 tokenId, string memory functionName) {
         if (poolData.useAccessToken) {
-            require(
-                IAccessNFT(poolData.accessToken).HasAccessNFT(msg.sender, tokenId, functionName),
-                Errors.FUNCTION_REQUIRES_ACCESS_NFT
-            );
+            require(IAccessNFT(poolData.accessToken).HasAccessNFT(msg.sender, tokenId, functionName), Errors.FUNCTION_REQUIRES_ACCESS_NFT);
         }
         _;
     }
@@ -106,17 +101,17 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
     }
 
     /// @inheritdoc IMME1155
-    function pause() external onlyPoolAdminOrOperations {
+    function pause() external onlyPoolAdmin {
         _pause();
-        ILPToken(poolData.poolLPToken).pause();
         emit PoolPaused(msg.sender);
+        ILPToken(poolData.poolLPToken).pause();
     }
 
     /// @inheritdoc IMME1155
-    function unpause() external onlyPoolAdmin {
+    function unpause() external timelockOnly {
         _unpause();
-        ILPToken(poolData.poolLPToken).unpause();
         emit PoolUnpaused(msg.sender);
+        ILPToken(poolData.poolLPToken).unpause();
     }
 
     /// @inheritdoc IMME1155
@@ -135,6 +130,7 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
         subpool.totalShares = subPools[subPoolId].totalShares;
         subpool.V = subPools[subPoolId].V;
         subpool.F = subPools[subPoolId].F;
+        subpool.status = subPools[subPoolId].status;
     }
 
     /// @inheritdoc IMME1155
@@ -206,9 +202,9 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
     }
 
     /// @inheritdoc IMME1155
-    function removeLiquidityStable(uint256 targetLP) external nonReentrant whenNotPaused {
+    function removeLiquidityStable(uint256 targetLP, uint256 minStable) external nonReentrant whenNotPaused {
         require(poolData.liquidityLimit.removeLiqMode != 1, Errors.LIQUIDITY_MODE_RESTRICTED);
-        Liquidity1155Logic.removeLiquidityStable(msg.sender, yieldReserve, targetLP, poolData, subPools, queuedWithdrawals);
+        Liquidity1155Logic.removeLiquidityStable(msg.sender, yieldReserve, targetLP, minStable, poolData, subPools, queuedWithdrawals);
     }
 
     /// @inheritdoc IMME1155
@@ -231,8 +227,8 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
     }
 
     /// @inheritdoc IMME1155
-    function processWithdrawals(uint256 limit) external whenNotPaused {
-        Liquidity1155Logic.processWithdrawals(limit, poolData, queuedWithdrawals);
+    function processWithdrawals(uint256 limit) external whenNotPaused returns(uint256 transactions) {
+        transactions = Liquidity1155Logic.processWithdrawals(limit, poolData, queuedWithdrawals);
     }
 
     /// @inheritdoc IMME1155
@@ -251,7 +247,7 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
     }
 
     /// @inheritdoc IMME1155
-    function addSubPool(uint256 v, uint256 f) external onlyPoolAdminOrOperations {
+    function addSubPool(uint256 v, uint256 f) external onlyPoolAdmin {
         Pool1155Logic.addSubPool(v, f, subPools);
     }
 
@@ -261,25 +257,24 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
     }
 
     /// @inheritdoc IMME1155
-    function changeSubPoolStatus(uint256[] calldata subPoolIds, bool newStatus) external onlyPoolAdminOrOperations {
+    function changeSubPoolStatus(uint256[] calldata subPoolIds, bool newStatus) external onlyPoolAdmin {
         Pool1155Logic.changeSubPoolStatus(subPoolIds, newStatus, subPools);
     }
 
     /// @inheritdoc IMME1155
-    function moveReserve(uint256 moverId, uint256 movedId, uint256 amount) external onlyPoolAdminOrOperations {
+    function moveReserve(uint256 moverId, uint256 movedId, uint256 amount) external onlyPoolAdmin {
         Pool1155Logic.moveReserve(moverId, movedId, amount, subPools, poolData);
     }
 
     /// @inheritdoc IMME1155
-    function moveShares(uint256 startId, uint256 endId, uint256 newSubPoolId) external onlyPoolAdminOrOperations {
+    function moveShares(uint256 startId, uint256 endId, uint256 newSubPoolId) external onlyPoolAdmin {
         Pool1155Logic.moveShares(startId, endId, newSubPoolId, subPools, poolData, tokenDistribution);
     }
 
     /// @inheritdoc IMME1155
-    function moveSharesList(uint256 newSubPoolIds, uint256[] calldata ids) external onlyPoolAdminOrOperations {
+    function moveSharesList(uint256 newSubPoolIds, uint256[] calldata ids) external onlyPoolAdmin {
         Pool1155Logic.moveSharesList(newSubPoolIds, ids, subPools, poolData, tokenDistribution);
     }
-
 
     /// @inheritdoc IMME1155
     function depositIntoStableYield(uint256 amount) external onlyPoolAdmin {
@@ -297,7 +292,7 @@ contract MME1155 is Initializable, AMMBase, IMME1155, ReentrancyGuardUpgradeable
     }
 
     /// @inheritdoc IMME1155
-    function WithdrawFees(address to, uint256 amount, DataTypes.FeeType feeType) external whenNotPaused {
+    function WithdrawFees(address to, uint256 amount, DataTypes.FeeType feeType) external {
         Pool1155Logic.withdrawFees(msg.sender, to, amount, feeType, poolData);
     }
 }

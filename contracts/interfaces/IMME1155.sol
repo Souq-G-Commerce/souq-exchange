@@ -110,14 +110,16 @@ interface IMME1155 {
     /**
      * @dev Function to remove liquidity by stable coins
      * @param targetLP The amount of LPs to be burned
+     * @param minStable The minimum stable tokens to receive
      */
-    function removeLiquidityStable(uint256 targetLP) external;
+    function removeLiquidityStable(uint256 targetLP, uint256 minStable) external;
 
     /**
      * @dev Function to process all queued transactions upto limit
      * @param limit The number of transactions to process
+     * @return uint256 The number of transactions processed
      */
-    function processWithdrawals(uint256 limit) external;
+    function processWithdrawals(uint256 limit) external returns(uint256);
 
     /**
      * @dev Function to get the LP token price

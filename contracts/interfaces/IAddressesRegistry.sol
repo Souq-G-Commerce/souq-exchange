@@ -5,7 +5,7 @@ pragma solidity 0.8.10;
  * @title IAddressesRegistry
  * @author Souq.Finance
  * @notice Defines the interface of the addresses registry.
- * @notice License: https://souq-nft-amm-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-peripheral-v1.s3.amazonaws.com/LICENSE.md
  */
 interface IAddressesRegistry {
     /**
