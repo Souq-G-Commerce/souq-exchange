@@ -4,7 +4,7 @@ pragma solidity 0.8.10;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import {IAddressesRegistry} from "../interfaces/IAddressesRegistry.sol";
 import {Errors} from "../libraries/Errors.sol";
@@ -17,7 +17,7 @@ import {ILPToken} from "../interfaces/ILPToken.sol";
  * @notice License: https://souq-nft-amm-v1.s3.amazonaws.com/LICENSE.md
  */
 contract LPToken is ILPToken, ERC20, ERC20Burnable, Pausable {
-    address internal _underlyingAsset;
+    using SafeERC20 for IERC20;
     IAddressesRegistry internal immutable addressesRegistry;
     address public immutable pool;
     uint8 public immutable tokenDecimals;
@@ -30,10 +30,12 @@ contract LPToken is ILPToken, ERC20, ERC20Burnable, Pausable {
         string memory name,
         uint8 _decimals
     ) ERC20(name, symbol) {
+        require(_pool != address(0), Errors.ADDRESS_IS_ZERO);
+        require(registry != address(0), Errors.ADDRESS_IS_ZERO);
         tokenDecimals = _decimals;
         pool = _pool;
         addressesRegistry = IAddressesRegistry(registry);
-        for (uint256 i = 0; i < tokens.length; i++) {
+        for (uint256 i = 0; i < tokens.length; ++i) {
             IERC1155(tokens[i]).setApprovalForAll(address(pool), true);
         }
     }
@@ -83,7 +85,8 @@ contract LPToken is ILPToken, ERC20, ERC20Burnable, Pausable {
 
     /// @inheritdoc ILPToken
     function setApproval20(address token, uint256 amount) external onlyPool {
-        IERC20(token).approve(pool, amount);
+        bool returnApproved = IERC20(token).approve(pool, amount);
+        require(returnApproved, Errors.APPROVAL_FAILED);
     }
 
     /// @inheritdoc ILPToken
@@ -101,7 +104,7 @@ contract LPToken is ILPToken, ERC20, ERC20Burnable, Pausable {
     /// @inheritdoc ILPToken
     function RescueTokens(address token, uint256 amount, address receiver) external onlyPool {
         //event emitted in the pool logic library
-        IERC20(token).transfer(receiver, amount);
+        IERC20(token).safeTransfer(receiver, amount);
     }
 
     /**

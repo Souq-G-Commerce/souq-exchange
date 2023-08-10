@@ -22,6 +22,7 @@ contract AMMBase is IAMMBase {
     DataTypes.PoolData public poolData;
 
     constructor(address _registry) {
+        require(_registry != address(0), Errors.ADDRESS_IS_ZERO);
         addressesRegistry = _registry;
     }
 

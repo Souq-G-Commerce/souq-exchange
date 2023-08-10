@@ -18,5 +18,12 @@
   },
   "exclude": ["node_modules"],
   "files": ["./hardhat.config.ts"],
-  "include": ["src/**/*", "test/**/*","scripts/**/*", "oldTests/AccessNFT.spec.ts", "test/AccessManager.spec.ts", "./scripts"]
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "scripts/**/*",
+    "oldTests/AccessNFT.spec.ts",
+    "test/AccessManager.spec.ts",
+    "./scripts"
+  ]
 }

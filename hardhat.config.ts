@@ -88,7 +88,7 @@ const config: HardhatUserConfig = {
       forking: {
         blockNumber: 16889989,
         enabled: true,
-        url: "https://mainnet.infura.io/v3/81225b20a74b46aa8f87b382d5cb1dfb",
+        url: "https://eth-mainnet.g.alchemy.com/v2/" + alchemyMainnetApiKey,
       },
       accounts: {
         mnemonic,

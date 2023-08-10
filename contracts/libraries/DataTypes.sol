@@ -102,6 +102,7 @@ library DataTypes {
         uint256 totalShares;
         uint256 V;
         uint256 F;
+        bool status;
     }
 
     struct FactoryFeeConfig {

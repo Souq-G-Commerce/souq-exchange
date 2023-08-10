@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.10;
 
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {Errors} from "../libraries/Errors.sol";
@@ -23,6 +24,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  */
 
 library Pool1155Logic {
+    using SafeERC20 for IERC20;
     using Math for uint256;
 
     /**
@@ -136,7 +138,7 @@ library Pool1155Logic {
      * @return total The TVL
      */
     function getTVL(DataTypes.AMMSubPool1155[] storage subPools) public view returns (uint256 total) {
-        for (uint256 i = 0; i < subPools.length; i++) {
+        for (uint256 i; i < subPools.length; ++i) {
             total += calculateTotal(subPools, i);
         }
     }
@@ -265,7 +267,7 @@ library Pool1155Logic {
         vars.stable = subPools[subPoolId].reserve;
         vars.shares = subPools[subPoolId].totalShares;
         //Iterating step sizes for enhanced results. If amount = 50, and stepsize is 15, then we iterate 4 times 15,15,15,5
-        for (vars.stepIndex = 0; vars.stepIndex < vars.steps + 1; vars.stepIndex++) {
+        for (vars.stepIndex; vars.stepIndex < vars.steps + 1; ++vars.stepIndex) {
             vars.stepAmount = vars.stepIndex == vars.steps
                 ? (shares - ((vars.stepIndex) * poolData.iterativeLimit.maxBulkStepSize))
                 : poolData.iterativeLimit.maxBulkStepSize;
@@ -274,7 +276,7 @@ library Pool1155Logic {
             vars.value = vars.stepAmount * vars.PV_0;
             if (useFee) vars.fees = calculateFees(operation, vars.value, poolData.fee);
             //Iterate the calculations while keeping PV_0 and stable the same and using the new PV to calculate the average and reiterate
-            for (vars.i = 0; vars.i < poolData.iterativeLimit.iterations; vars.i++) {
+            for (vars.i = 0; vars.i < poolData.iterativeLimit.iterations; ++vars.i) {
                 if (operation == DataTypes.OperationType.buyShares) {
                     //if buying shares, the pool receives stable plus the swap fee and gives out shares
                     vars.newCash = vars.stable + vars.value + (useFee ? vars.fees.lpFee : 0);
@@ -334,7 +336,7 @@ library Pool1155Logic {
         subPools[subPoolId].F = den == 0 ? 0 : num / den;
         //Iteration 0 is done, iterate through the rest
         if (poolData.iterativeLimit.iterations > 1) {
-            for (uint256 i = 0; i < poolData.iterativeLimit.iterations - 1; i++) {
+            for (uint256 i; i < poolData.iterativeLimit.iterations - 1; ++i) {
                 den = (subPools[subPoolId].reserve + (MathHelpers.convertFromWad(subPools[subPoolId].F * temp) / poolData.coefficientC));
                 subPools[subPoolId].F = den == 0 ? 0 : num / den;
             }
@@ -393,7 +395,7 @@ library Pool1155Logic {
         DataTypes.PoolData storage poolData
     ) external {
         require(subPoolIds.length == vArray.length, Errors.ARRAY_NOT_SAME_LENGTH);
-        for (uint256 i = 0; i < subPoolIds.length; i++) {
+        for (uint256 i; i < subPoolIds.length; ++i) {
             subPools[subPoolIds[i]].V = vArray[i];
             updatePriceIterative(subPools, poolData, subPoolIds[i]);
         }
@@ -417,7 +419,7 @@ library Pool1155Logic {
         mapping(uint256 => uint256) storage tokenDistribution
     ) external {
         DataTypes.MoveSharesVars memory vars;
-        for (vars.i = startId; vars.i < endId + 1; vars.i++) {
+        for (vars.i = startId; vars.i < endId + 1; ++vars.i) {
             vars.poolId = tokenDistribution[vars.i];
             if (subPools[newSubPoolId].shares[vars.i] > 0) {
                 subPools[newSubPoolId].shares[vars.i] = subPools[vars.poolId].shares[vars.i];
@@ -444,7 +446,7 @@ library Pool1155Logic {
         mapping(uint256 => uint256) storage tokenDistribution
     ) external {
         DataTypes.MoveSharesVars memory vars;
-        for (vars.i = 0; vars.i < ids.length; vars.i += 1) {
+        for (vars.i; vars.i < ids.length; ++vars.i) {
             vars.poolId = tokenDistribution[ids[vars.i]];
             if (subPools[newSubPoolId].shares[ids[vars.i]] > 0) {
                 subPools[newSubPoolId].shares[ids[vars.i]] = subPools[vars.poolId].shares[ids[vars.i]];
@@ -463,7 +465,7 @@ library Pool1155Logic {
      * @param subPools The subpools array
      */
     function changeSubPoolStatus(uint256[] memory subPoolIds, bool newStatus, DataTypes.AMMSubPool1155[] storage subPools) external {
-        for (uint256 i = 0; i < subPoolIds.length; i++) {
+        for (uint256 i; i < subPoolIds.length; ++i) {
             subPools[subPoolIds[i]].status = newStatus;
         }
         emit ChangedSubpoolStatus(msg.sender, subPoolIds, newStatus);
@@ -503,7 +505,7 @@ library Pool1155Logic {
         mapping(uint256 => uint256) storage tokenDistribution
     ) external view returns (uint256[] memory subPools) {
         subPools = new uint256[](tokenIds.length);
-        for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length; ++i) {
             subPools[i] = tokenDistribution[tokenIds[i]];
         }
     }
@@ -522,7 +524,7 @@ library Pool1155Logic {
     ) external view returns (uint256[] memory subPools) {
         require(startTokenId <= endTokenId, "END_ID_LESS_THAN_START");
         subPools = new uint256[](endTokenId - startTokenId + 1);
-        for (uint256 i = startTokenId; i < endTokenId + 1; i++) {
+        for (uint256 i = startTokenId; i < endTokenId + 1; ++i) {
             subPools[i] = tokenDistribution[i];
         }
     }
@@ -560,8 +562,8 @@ library Pool1155Logic {
      */
     function RescueTokens(address token, uint256 amount, address receiver, address stableToken, address poolLPToken) external {
         require(token != stableToken, Errors.CANNOT_RESCUE_POOL_TOKEN);
-        ILPToken(poolLPToken).RescueTokens(token, amount, receiver);
         emit Rescued(msg.sender, token, amount, receiver);
+        ILPToken(poolLPToken).RescueTokens(token, amount, receiver);
     }
 
     /**
@@ -577,13 +579,13 @@ library Pool1155Logic {
         address stableYieldAddress,
         uint256 yieldReserve
     ) external returns (uint256) {
+        emit YieldDeposited(msg.sender, amount, stableYieldAddress);
         IStablecoinYieldConnector(
             IConnectorRouter(IAddressesRegistry(addressesRegistry).getConnectorsRouter()).getStablecoinYieldConnectorContract(
                 stableYieldAddress
             )
         ).depositUSDC(amount);
 
-        emit YieldDeposited(msg.sender, amount, stableYieldAddress);
         // Return the updated yield reserve value
         return yieldReserve + amount;
     }
@@ -609,9 +611,10 @@ library Pool1155Logic {
         );
         address aTokenAddress = stableConnector.getATokenAddress();
         require(IERC20(aTokenAddress).balanceOf(address(this)) >= amount, Errors.INVALID_AMOUNT);
-        IERC20(aTokenAddress).approve(address(stableConnector), amount);
-        stableConnector.withdrawUSDC(amount, amount);
         emit YieldWithdrawn(msg.sender, amount, stableYieldAddress);
+        bool approveReturn = IERC20(aTokenAddress).approve(address(stableConnector), amount);
+        require(approveReturn, Errors.APPROVAL_FAILED);
+        stableConnector.withdrawUSDC(amount, amount);
         // Return the updated yield reserve value
         return yieldReserve - amount;
     }
@@ -634,16 +637,16 @@ library Pool1155Logic {
         //If withdrawing royalties and the msg.sender matches the royalties address
         if (feeType == DataTypes.FeeType.royalties && user == poolData.fee.royaltiesAddress && amount <= poolData.fee.royaltiesBalance) {
             poolData.fee.royaltiesBalance -= amount;
-            ILPToken(poolData.poolLPToken).setApproval20(poolData.stable, amount);
-            IERC20(poolData.stable).transferFrom(poolData.poolLPToken, to, amount);
             emit WithdrawnFees(user, to, amount, "royalties");
+            ILPToken(poolData.poolLPToken).setApproval20(poolData.stable, amount);
+            IERC20(poolData.stable).safeTransferFrom(poolData.poolLPToken, to, amount);
         }
         //If withdrawing protocol fees and the msg.sender matches the protocol address
         if (feeType == DataTypes.FeeType.protocol && user == poolData.fee.protocolFeeAddress && amount <= poolData.fee.protocolBalance) {
             poolData.fee.protocolBalance -= amount;
-            ILPToken(poolData.poolLPToken).setApproval20(poolData.stable, amount);
-            IERC20(poolData.stable).transferFrom(poolData.poolLPToken, to, amount);
             emit WithdrawnFees(user, to, amount, "protocol");
+            ILPToken(poolData.poolLPToken).setApproval20(poolData.stable, amount);
+            IERC20(poolData.stable).safeTransferFrom(poolData.poolLPToken, to, amount);
         }
     }
 }

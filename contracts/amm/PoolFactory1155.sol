@@ -27,10 +27,12 @@ contract PoolFactory1155 is IPoolFactory1155, Initializable, UUPSUpgradeable, Pr
     IAddressesRegistry public immutable addressesRegistry;
 
     constructor(address registry) {
+        require(registry != address(0), Errors.ADDRESS_IS_ZERO);
         addressesRegistry = IAddressesRegistry(registry);
     }
 
     function initialize(address _poolLogic, DataTypes.FactoryFeeConfig calldata _feeConfig) external initializer {
+        require(_poolLogic != address(0), Errors.ADDRESS_IS_ZERO);
         poolLogic = _poolLogic;
         feeConfig = _feeConfig;
         onlyPoolAdminDeployments = false;
@@ -93,7 +95,6 @@ contract PoolFactory1155 is IPoolFactory1155, Initializable, UUPSUpgradeable, Pr
         poolData.fee.protocolSellRatio = feeConfig.protocolSellRatio;
         poolData.fee.protocolBuyRatio = feeConfig.protocolBuyRatio;
         address proxy = deployBeaconProxy(poolLogic, "");
-        IMME1155(proxy).initialize(poolData, symbol, name);
         pools.push(proxy);
         emit PoolDeployed(
             msg.sender,
@@ -105,6 +106,7 @@ contract PoolFactory1155 is IPoolFactory1155, Initializable, UUPSUpgradeable, Pr
             name,
             poolData.liquidityLimit.poolTvlLimit
         );
+        IMME1155(proxy).initialize(poolData, symbol, name);
         return proxy;
     }
 
@@ -120,11 +122,12 @@ contract PoolFactory1155 is IPoolFactory1155, Initializable, UUPSUpgradeable, Pr
 
     /// @inheritdoc IPoolFactory1155
     function upgradePools(address newLogic) external onlyUpgrader {
+        require(newLogic != address(0), Errors.ADDRESS_IS_ZERO);
+        emit PoolsUpgraded(msg.sender, newLogic);
         poolLogic = newLogic;
         //Change beacon logic
         upgradeBeacon(newLogic);
         ++poolsVersion;
-        emit PoolsUpgraded(msg.sender, newLogic);
     }
 
     /// @inheritdoc IPoolFactory1155
@@ -149,6 +152,6 @@ contract PoolFactory1155 is IPoolFactory1155, Initializable, UUPSUpgradeable, Pr
      */
     function _authorizeUpgrade(address newImplementation) internal override onlyUpgrader {
         require(newImplementation != address(0), Errors.ADDRESS_IS_ZERO);
-        version++;
+        ++version;
     }
 }

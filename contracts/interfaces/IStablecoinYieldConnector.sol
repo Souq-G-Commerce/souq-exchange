@@ -7,7 +7,7 @@ import {DataTypes} from "../libraries/DataTypes.sol";
  * @title IStablecoinYieldConnector
  * @author Souq.Finance
  * @notice Defines the interface of the stablecoin yield connector
- * @notice License: https://souq-nft-amm-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-peripheral-v1.s3.amazonaws.com/LICENSE.md
  */
 interface IStablecoinYieldConnector {
     event DepositUSDC(address indexed depositor, uint256 amount);
