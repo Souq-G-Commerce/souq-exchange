@@ -81,4 +81,3 @@ library Errors {
     string public constant APPROVAL_FAILED = "APPROVAL_FAILED";
     string public constant DISCOUNT_EXCEEDS_100 = "DISCOUNT_EXCEEDS_100";
 }
-
