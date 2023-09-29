@@ -5,10 +5,11 @@ pragma solidity 0.8.10;
  * @title library for Errors mapping
  * @author Souq.Finance
  * @notice Defines the output of error messages reverted by the contracts of the Souq protocol
- * @notice License: https://souq-nft-amm-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-exchange.s3.amazonaws.com/LICENSE.md
  */
 library Errors {
     string public constant ADDRESS_IS_ZERO = "ADDRESS_IS_ZERO";
+    string public constant VALUE_CANNOT_BE_ZERO = "VALUE_CANNOT_BE_ZERO";
     string public constant NOT_ENOUGH_USER_BALANCE = "NOT_ENOUGH_USER_BALANCE";
     string public constant NOT_ENOUGH_APPROVED = "NOT_ENOUGH_APPROVED";
     string public constant INVALID_AMOUNT = "INVALID_AMOUNT";
@@ -24,6 +25,7 @@ library Errors {
     string public constant CALLER_NOT_ORACLE_ADMIN = "CALLER_NOT_ORACLE_ADMIN";
     string public constant CALLER_NOT_TIMELOCK = "CALLER_NOT_TIMELOCK";
     string public constant CALLER_NOT_TIMELOCK_ADMIN = "CALLER_NOT_TIMELOCK_ADMIN";
+    string public constant CALLER_NOT_CONNECTOR_ADMIN = "CALLER_NOT_CONNECTOR_ADMIN";
     string public constant ADDRESS_IS_PROXY = "ADDRESS_IS_PROXY";
     string public constant ARRAY_NOT_SAME_LENGTH = "ARRAY_NOT_SAME_LENGTH";
     string public constant NO_SUB_POOL_AVAILABLE = "NO_SUB_POOL_AVAILABLE";
@@ -80,4 +82,7 @@ library Errors {
     string public constant TIMELOCK_TRANSACTION_ALREADY_QUEUED = "TIMELOCK_TRANSACTION_ALREADY_QUEUED";
     string public constant APPROVAL_FAILED = "APPROVAL_FAILED";
     string public constant DISCOUNT_EXCEEDS_100 = "DISCOUNT_EXCEEDS_100";
+    string public constant SUBPOOL_NOT_FOUND="SUBPOOL_NOT_FOUND";
+    string public constant VAULT_SHARE_MATURED="VAULT_SHARE_MATURED";
+    string public constant SHARES_VALUE_CANNOT_BE_ZERO="SHARES_VALUE_CANNOT_BE_ZERO";
 }

@@ -5,12 +5,67 @@ pragma solidity 0.8.10;
  * @title library for Data structures
  * @author Souq.Finance
  * @notice Defines the structures used by the contracts of the Souq protocol
- * @notice License: https://souq-nft-amm-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-exchange.s3.amazonaws.com/LICENSE.md
  */
 library DataTypes {
-    struct ERC1155Collection {
-        address tokenAddress;
-        uint256 tokenID;
+    struct PoolSVSData {
+        bool useAccessToken;
+        address accessToken;
+        address poolLPToken;
+        address stable;
+        address[] tokens;
+        address stableYieldAddress;
+        Coefficients coefficients;
+        PoolFee fee;
+        LiquidityLimit liquidityLimit;
+        IterativeLimit iterativeLimit;
+        uint256 firstActivePool;
+        uint256 maxMaturityRange;
+    }
+
+    struct AMMSubPoolSVSDetails {
+        uint256 reserve;
+        uint256 totalShares;
+        uint256 start;
+        uint256 lockupTime;
+        uint256 F;
+        bool status;
+    }
+    struct SubPoolCheckerVars {
+        uint256 subPoolIndex;
+        bool foundSubPool;
+        uint256 lockupStart;
+        uint256 lockupTime;
+        bool matured;
+        uint256 lpPrice;
+        uint256 v;
+        uint256 total;
+    }
+    struct Coefficients {
+        uint256 coefficientA;
+        uint256 coefficientB;
+        uint256 coefficientC;
+    }
+    struct AMMSubPoolSVS {
+        uint256 reserve;
+        uint256 totalShares;
+        bool status;
+        uint256 F;
+        uint256 lockupTime;
+        uint256 start;
+        uint256[] tokenIds;
+        //tokenid -> amount + lockup
+        //if lockup is 0, means the share was moved to another subpool or redeemed
+        mapping(uint256 => AMMShareSVS) shares;
+    }
+    struct AMMShareSVS {
+        uint256 amount;
+        uint256 start;
+        uint256 lockupTime;
+    }
+    struct VaultSharesReturn {
+        uint256 tranche;
+        uint256 amount;
     }
 
     struct AMMShare1155 {
@@ -70,6 +125,7 @@ library DataTypes {
         uint256 i;
         uint256 index;
         uint256 subPoolId;
+        bool matured;
         SharesCalculationReturn cal;
         ParamGroup[] paramGroups;
     }
@@ -139,8 +195,8 @@ library DataTypes {
         uint256 cooldown;
         uint256 maxDepositPercentage;
         uint256 maxWithdrawPercentage;
-        uint256 minFeeMultiplier;
-        uint256 maxFeeMultiplier;
+        uint256 feeMultiplier;
+        uint256 lastLpPrice;
         uint8 addLiqMode;
         uint8 removeLiqMode;
         bool onlyAdminProvisioning;
@@ -197,11 +253,22 @@ library DataTypes {
         uint256 amount;
         uint256 value;
         uint256 F;
+        uint256 lastLpPrice;
         FeeReturn fees;
+    }
+
+    struct LiquidityDetailsVars {
+        uint8 i;
+        uint256 total;
+        uint256 stablePrice;
+        address[] VITs;
+        uint256[] amounts;
     }
 
     struct LiqLocalVars {
         uint256 TVL;
+        uint256 TVLActive;
+        uint256 v;
         uint256 LPPrice;
         uint256 LPAmount;
         uint256 stable;

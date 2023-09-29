@@ -1,11 +1,11 @@
-// SPDX-License-Identifier: BUSL
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.10;
 
 /**
  * @title ISouqTimelock
  * @author Souq.Finance
  * @notice Defines the interface of timelock contract
- * @notice License: https://souq-peripheral-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-peripherals.s3.amazonaws.com/LICENSE.md
  */
 
 interface ISouqTimelock {

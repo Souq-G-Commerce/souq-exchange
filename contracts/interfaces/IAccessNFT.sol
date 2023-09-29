@@ -1,11 +1,11 @@
-// SPDX-License-Identifier: AGPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.10;
 
 /**
  * @title IAccessNFT
  * @author Souq.Finance
  * @notice Defines the interface of the Access NFT contract
- * @notice License: https://souq-peripheral-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-peripherals.s3.amazonaws.com/LICENSE.md
  */
 interface IAccessNFT {
     /**
@@ -58,13 +58,13 @@ interface IAccessNFT {
      * @param discount The discount in wei
      */
     function setFeeDiscount(uint256 tokenId, uint256 discount) external;
-    
+
     /**
      * @dev Returns the fee discount percentage for a specific NFT
      * @param tokenId The token id
      * @return uint256 The discount in wei
      */
-    function getFeeDiscount(uint256 tokenId) external view returns(uint256);
+    function getFeeDiscount(uint256 tokenId) external view returns (uint256);
 
     /**
      * @dev Sets the URI for the token metadata

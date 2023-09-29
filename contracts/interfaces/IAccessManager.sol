@@ -8,7 +8,7 @@ import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol"
  * @title IAccessManager
  * @author Souq.Finance
  * @notice The interface for the Access Manager Contract
- * @notice License: https://souq-peripheral-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-peripherals.s3.amazonaws.com/LICENSE.md
  */
 interface IAccessManager is IAccessControl {
     /**
