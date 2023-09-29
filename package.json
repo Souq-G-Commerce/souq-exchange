@@ -1,7 +1,7 @@
 {
-  "name": "souq-nft-amm-v1",
-  "description": "Souq NFT AMM v1",
-  "version": "1.0.0",
+  "name": "souq-exchange",
+  "description": "Souq Exchange",
+  "version": "1.0.1",
   "author": {
     "name": "Souq Dev Team",
     "url": "https://souq.finance"

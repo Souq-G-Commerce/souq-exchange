@@ -8,7 +8,7 @@ Parameters
 
 Licensor: Souq G-Commerce, Inc.
 
-Licensed Work: [souq-nft-amm-v1](https://github.com/Souq-G-Commerce/souq-nft-amm-v1).
+Licensed Work: [souq-exchange](https://github.com/Souq-G-Commerce/souq-exchange).
 The Licensed Work is © 2023 Souq G-Commerce, Inc.
 
 Additional Use Grant: None

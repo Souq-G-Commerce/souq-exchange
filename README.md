@@ -6,9 +6,9 @@
  |____/   \___/   \___/   \__\_\ (_) |_|     |___| |_| \_| /_/   \_\ |_| \_|  \____| |_____|
 
 ```
-# Souq NFT AMM V1
+# Souq Exchange
 
-This repository contains all the core smart contract source code for Souq NFT AMM V1. The repository uses Hardhat as development environment for compilation, testing and deployment tasks.
+This repository contains all the core smart contract source code for Souq Exchange. The repository uses Hardhat as development environment for compilation, testing and deployment tasks.
 
 # What is Souq?
 
