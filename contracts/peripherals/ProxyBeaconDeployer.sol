@@ -8,7 +8,7 @@ import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/Upgradeabl
  * @title ProxyBeaconDeployer
  * @author Souq.Finance
  * @notice The proxy beacon deployer inherited by the pool factory
- * @notice License: https://souq-nft-amm-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-exchange.s3.amazonaws.com/LICENSE.md
  */
 contract ProxyBeaconDeployer {
     bool private _isSetBeacon;
@@ -57,6 +57,7 @@ contract ProxyBeaconDeployer {
         address payable addr;
         bytes memory _bytecode = type(BeaconProxy).creationCode;
         bytes memory _code = abi.encodePacked(_bytecode, abi.encode(address(beacon), payload));
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             addr := create(0, add(_code, 0x20), mload(_code))
             if iszero(extcodesize(addr)) {

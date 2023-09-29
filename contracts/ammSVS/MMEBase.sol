@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.10;
 
-import {IAMMBase} from "../interfaces/IAMMBase.sol";
+import {IMMEBase} from "../interfaces/IMMEBase.sol";
 import {Errors} from "../libraries/Errors.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IAddressesRegistry} from "../interfaces/IAddressesRegistry.sol";
 import {IAccessManager} from "../interfaces/IAccessManager.sol";
-import {Pool1155Logic} from "../libraries/Pool1155Logic.sol";
 
 /**
- * @title AMMBase
+ * @title MMEBase
  * @author Souq.Finance
  * @notice The Base contract to be inherited by MMEs
- * @notice License: https://souq-nft-amm-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-exchange.s3.amazonaws.com/LICENSE.md
  */
-contract AMMBase is IAMMBase {
+contract MMEBase is IMMEBase {
     using Math for uint256;
     uint256 public yieldReserve;
     address public immutable addressesRegistry;
-    DataTypes.PoolData public poolData;
+    DataTypes.PoolSVSData public poolData;
+    uint256[50] __gap;
 
     constructor(address _registry) {
         require(_registry != address(0), Errors.ADDRESS_IS_ZERO);
@@ -49,7 +49,7 @@ contract AMMBase is IAMMBase {
         _;
     }
 
-    /// @inheritdoc IAMMBase
+    /// @inheritdoc IMMEBase
     function setFee(DataTypes.PoolFee calldata newFee) external onlyPoolAdmin {
         poolData.fee.lpBuyFee = newFee.lpBuyFee;
         poolData.fee.lpSellFee = newFee.lpSellFee;
@@ -62,7 +62,7 @@ contract AMMBase is IAMMBase {
         emit FeeChanged(poolData.fee);
     }
 
-    /// @inheritdoc IAMMBase
+    /// @inheritdoc IMMEBase
     function setPoolIterativeLimits(DataTypes.IterativeLimit calldata newLimits) external onlyPoolAdmin {
         poolData.iterativeLimit.minimumF = newLimits.minimumF;
         poolData.iterativeLimit.maxBulkStepSize = newLimits.maxBulkStepSize;
@@ -70,7 +70,7 @@ contract AMMBase is IAMMBase {
         emit PoolIterativeLimitsSet(poolData.iterativeLimit);
     }
 
-    /// @inheritdoc IAMMBase
+    /// @inheritdoc IMMEBase
     function setPoolLiquidityLimits(DataTypes.LiquidityLimit calldata newLimits) external onlyPoolAdmin {
         poolData.liquidityLimit.poolTvlLimit = newLimits.poolTvlLimit;
         poolData.liquidityLimit.cooldown = newLimits.cooldown;
@@ -84,14 +84,4 @@ contract AMMBase is IAMMBase {
         emit PoolLiquidityLimitsSet(poolData.liquidityLimit);
     }
 
-    /// @inheritdoc IAMMBase
-    function setPoolData(DataTypes.PoolData calldata newPoolData) external onlyPoolAdmin {
-        poolData.useAccessToken = newPoolData.useAccessToken;
-        poolData.accessToken = newPoolData.accessToken;
-        poolData.stableYieldAddress = newPoolData.stableYieldAddress;
-        poolData.coefficientA = newPoolData.coefficientA;
-        poolData.coefficientB = newPoolData.coefficientB;
-        poolData.coefficientC = newPoolData.coefficientC;
-        emit PoolDataSet(poolData);
-    }
 }

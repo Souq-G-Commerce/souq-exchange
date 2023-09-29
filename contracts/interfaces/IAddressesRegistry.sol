@@ -1,11 +1,11 @@
-// SPDX-License-Identifier: AGPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.10;
 
 /**
  * @title IAddressesRegistry
  * @author Souq.Finance
  * @notice Defines the interface of the addresses registry.
- * @notice License: https://souq-peripheral-v1.s3.amazonaws.com/LICENSE.md
+ * @notice License: https://souq-peripherals.s3.amazonaws.com/LICENSE.md
  */
 interface IAddressesRegistry {
     /**
