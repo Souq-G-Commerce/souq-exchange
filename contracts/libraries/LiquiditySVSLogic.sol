@@ -217,6 +217,11 @@ library LiquiditySVSLogic {
     ) external {
         DataTypes.SubPoolCheckerVars memory checkerVars;
         require(params.tokenIds.length == params.amounts.length, Errors.ARRAY_NOT_SAME_LENGTH);
+        (checkerVars.v, checkerVars.total, , checkerVars.lpPrice) = PoolSVSLogic.calculateLiquidityDetailsIterative(
+            addressesRegistry,
+            poolData,
+            subPools
+        );
         for (uint256 i = 0; i < params.tokenIds.length; ++i) {
             (
                 checkerVars.subPoolIndex,
@@ -243,12 +248,9 @@ library LiquiditySVSLogic {
                 ""
             );
         }
+        (, checkerVars.tvl, , ) = PoolSVSLogic.calculateLiquidityDetailsIterative(addressesRegistry, poolData, subPools);
+        ILPTokenSVS(poolData.poolLPToken).mint(user, MathHelpers.convertToWad(checkerVars.tvl - checkerVars.total) / checkerVars.lpPrice);
         IERC20(poolData.stable).safeTransferFrom(user, poolData.poolLPToken, stableIn);
-        (checkerVars.v, , , checkerVars.lpPrice) = PoolSVSLogic.calculateLiquidityDetailsIterative(addressesRegistry, poolData, subPools);
-        ILPTokenSVS(poolData.poolLPToken).mint(
-            user,
-            MathHelpers.convertToWad(PoolSVSLogic.calculateTotal(subPools, checkerVars.v, subPoolId)) / checkerVars.lpPrice
-        );
     }
 
     /**

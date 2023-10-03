@@ -40,6 +40,7 @@ library DataTypes {
         uint256 lpPrice;
         uint256 v;
         uint256 total;
+        uint256 tvl;
     }
     struct Coefficients {
         uint256 coefficientA;
